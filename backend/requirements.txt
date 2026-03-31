@@ -1,0 +1,10 @@
+django
+djangorestframework
+django-ratelimit
+python-dotenv
+django-redis
+rapidfuzz
+gunicorn
+whitenoise
+dj-database-url
+psycopg2-binary
