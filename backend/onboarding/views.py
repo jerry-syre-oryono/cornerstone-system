@@ -7,6 +7,10 @@ from .services import find_match
 from users.models import User
 from alumni.models import Person, AlumniAccount
 
+from drf_spectacular.utils import extend_schema
+from .serializers import RegisterAlumniSerializer, LoginSerializer
+
+@extend_schema(request=RegisterAlumniSerializer, responses={200: dict})
 @api_view(['POST'])
 @ratelimit(key='ip', rate='10/m')
 def register_alumni(request):
@@ -60,6 +64,7 @@ def register_alumni(request):
 
     return Response({"status": "account_created", "user_id": user.id})
 
+@extend_schema(request=LoginSerializer, responses={200: dict})
 @api_view(['POST'])
 @ratelimit(key='ip', rate='10/m')
 def login_user(request):
