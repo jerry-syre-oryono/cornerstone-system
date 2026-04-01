@@ -31,6 +31,8 @@ This document summarizes the architectural and functional updates made to the Co
 - **Automated Tests**: Created `onboarding/tests.py` covering:
   - Successful registration and data syncing.
   - Prevention of duplicate registrations for the same alumni record.
+- **Swagger Assets**: Configured `drf-spectacular-sidecar` to ensure all documentation assets (CSS/JS) are served directly from the backend, fixing the "blank page" issue on Render.
+- **CORS Configuration**: Installed and configured `django-cors-headers` to allow the React frontend to securely communicate with the API.
 - **Bug Fixes**: 
   - Resolved `NoReverseMatch` errors by adding names to URL patterns in `config/urls.py`.
   - Fixed environment dependencies (installed `whitenoise` and `dj-database-url`).

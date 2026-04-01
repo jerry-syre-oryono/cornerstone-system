@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'onboarding',
     'careers',
     'drf_spectacular',
+    'drf_spectacular_sidecar',
     'corsheaders',
 ]
 
@@ -150,6 +151,26 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Cornerstone Alumni System API',
+    'DESCRIPTION': 'API documentation for the Cornerstone Alumni management system.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # Swagger UI settings
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+}
 
 # Add to bottom of file
 
