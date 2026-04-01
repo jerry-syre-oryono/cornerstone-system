@@ -2,6 +2,9 @@ import pandas as pd
 from alumni.models import Person
 import os
 
+# Get the directory where this script is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
 def clean(val):
     if pd.isna(val):
         return None
@@ -17,8 +20,15 @@ def clean_int(val, default=0):
 
 def run():
     # Update filename to match your Excel file
-    file_path = os.path.join(os.path.dirname(__file__), "UG DATA BASE 2021.xlsx")
+    file_path = os.path.join(script_dir, "UG DATA BASE 2021.xlsx")
+    
+    if not os.path.exists(file_path):
+        print(f"Error: File not found at {file_path}")
+        return
+    
     df = pd.read_excel(file_path)
+    count = 0
+    skipped = 0
     
     for _, row in df.iterrows():
         full_name = clean(row.get("Names"))
@@ -33,6 +43,7 @@ def run():
         
         if not first_name:
             print(f"Skipping row due to missing name: {row.to_dict()}")
+            skipped += 1
             continue
         
         Person.objects.create(
@@ -43,5 +54,6 @@ def run():
             email=clean(row.get("Email")),
             phone_primary=clean(row.get("Tell 1 ( MTN)")),
         )
+        count += 1
     
-    print(f"Imported {len(df)} records")
+    print(f"Imported {count} records (skipped {skipped})")
