@@ -1,18 +1,52 @@
 from django.db import models
-from django.conf import settings
-
-User = settings.AUTH_USER_MODEL
 
 class Person(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    full_name = models.CharField(max_length=255)
-    graduation_year = models.IntegerField()
-    email = models.EmailField(null=True, blank=True)
-    email_verified = models.BooleanField(default=False)
-    phone_primary = models.CharField(max_length=20, null=True, blank=True)
-    account_created = models.BooleanField(default=False)
-
+    # Basic Information
+    index_number = models.CharField(max_length=50, blank=True, null=True)
+    names = models.CharField(max_length=255, blank=True, null=True)
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+    sir_name = models.CharField(max_length=100, blank=True, null=True)
+    full_name = models.CharField(max_length=255, blank=True, null=True)
+    
+    # Academic Information
+    graduation_year = models.IntegerField(blank=True, null=True)
+    course_offered = models.TextField(blank=True, null=True, verbose_name="Course offered at University")
+    
+    # Location Information
+    home_district = models.CharField(max_length=100, blank=True, null=True)
+    district_of_residence = models.CharField(max_length=100, blank=True, null=True)
+    village_residence = models.CharField(max_length=255, blank=True, null=True, verbose_name="Village/ward of residence")
+    
+    # Contact Information
+    email = models.EmailField(blank=True, null=True)
+    phone_primary = models.CharField(max_length=50, blank=True, null=True, verbose_name="Tell 1 (MTN)")
+    phone_secondary = models.CharField(max_length=50, blank=True, null=True, verbose_name="Tell 2 (Airtel/UTL)")
+    
+    # Employment Information
+    employment_status = models.CharField(max_length=50, blank=True, null=True, choices=[
+        ('EMPLOYED', 'Employed'),
+        ('UNEMPLOYED', 'Unemployed'),
+        ('NOT SURE', 'Not Sure'),
+        ('DECEASED', 'Deceased'),
+    ])
+    sector_of_work = models.CharField(max_length=100, blank=True, null=True)
+    area_of_work = models.CharField(max_length=255, blank=True, null=True)
+    place_of_work = models.CharField(max_length=255, blank=True, null=True)
+    position_at_workplace = models.CharField(max_length=255, blank=True, null=True)
+    
+    # Personal Information
+    marital_status = models.CharField(max_length=50, blank=True, null=True)
+    field_of_interest = models.TextField(blank=True, null=True)
+    best_communication_channel = models.CharField(max_length=255, blank=True, null=True)
+    title_roles = models.TextField(blank=True, null=True, verbose_name="Title/Roles")
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name_plural = "People"
+        ordering = ['graduation_year', 'first_name']
+    
     def __str__(self):
-        return f"{self.full_name} ({self.graduation_year})"
+        return self.full_name or f"{self.first_name} {self.sir_name}" or self.names or "Unnamed"
