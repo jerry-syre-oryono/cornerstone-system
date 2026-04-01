@@ -57,3 +57,12 @@ class YouthCorpsAlumni(Person):
         proxy = True
         verbose_name = "Youth Corps Alumni"
         verbose_name_plural = "Youth Corps Alumni"
+
+class AlumniAccount(models.Model):
+    """Link table between User and Person record"""
+    user = models.OneToOneField('users.User', on_delete=models.CASCADE, related_name='alumni_profile')
+    person = models.OneToOneField(Person, on_delete=models.CASCADE, related_name='alumni_account')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Account for {self.person.full_name or self.person.first_name}"

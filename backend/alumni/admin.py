@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Person
+from .models import Person, AlumniAccount
+
+@admin.register(AlumniAccount)
+class AlumniAccountAdmin(admin.ModelAdmin):
+    list_display = ['user', 'person', 'created_at']
+    search_fields = ['user__email', 'person__full_name', 'person__first_name']
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
