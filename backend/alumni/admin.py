@@ -3,42 +3,14 @@ from .models import Person
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = [
-        'full_name',
-        'first_name',
-        'sir_name',
-        'graduation_year',
-        'email',
-        'phone_primary',
-        'employment_status',
-        'sector_of_work',
-        'home_district',
-    ]
-    
-    list_filter = [
-        'graduation_year',
-        'employment_status',
-        'marital_status',
-        'sector_of_work',
-        'home_district',
-    ]
-    
-    search_fields = [
-        'full_name',
-        'first_name',
-        'sir_name',
-        'names',
-        'email',
-        'phone_primary',
-        'home_district',
-        'place_of_work',
-    ]
-    
+    list_display = ['full_name', 'graduation_year', 'home_district', 'email', 'phone_primary', 'data_source']
+    list_filter = ['graduation_year', 'home_district', 'employment_status', 'data_source']
+    search_fields = ['full_name', 'first_name', 'sir_name', 'email', 'home_district', 'place_of_work']
     readonly_fields = ['created_at', 'updated_at']
     
     fieldsets = (
         ('Personal Information', {
-            'fields': ('index_number', 'names', 'first_name', 'sir_name', 'full_name', 'marital_status')
+            'fields': ('full_name', 'first_name', 'sir_name', 'marital_status', 'data_source')
         }),
         ('Contact Information', {
             'fields': ('email', 'phone_primary', 'phone_secondary')
@@ -46,13 +18,13 @@ class PersonAdmin(admin.ModelAdmin):
         ('Academic Information', {
             'fields': ('graduation_year', 'course_offered')
         }),
-        ('Location Information', {
+        ('Location', {
             'fields': ('home_district', 'district_of_residence', 'village_residence')
         }),
-        ('Employment Information', {
+        ('Employment', {
             'fields': ('employment_status', 'sector_of_work', 'area_of_work', 'place_of_work', 'position_at_workplace')
         }),
-        ('Other Information', {
+        ('Other', {
             'fields': ('field_of_interest', 'best_communication_channel', 'title_roles')
         }),
         ('Metadata', {
