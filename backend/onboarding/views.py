@@ -1,18 +1,19 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.utils import timezone
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
 from .services import find_match
-from users.models import User
 from alumni.models import Person, AlumniAccount
 
 from drf_spectacular.utils import extend_schema
 from .serializers import RegisterAlumniSerializer, LoginSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer
+
+User = get_user_model()
 
 @extend_schema(request=RegisterAlumniSerializer, responses={200: dict})
 @api_view(['POST'])
@@ -89,15 +90,18 @@ def login_user(request):
 
     if user is not None:
         login(request, user)
+        
+        # Safely try to get person_id via alumni_profile (AlumniAccount)
         person_id = None
-        if hasattr(user, 'alumni_profile'):
-            person_id = user.alumni_profile.person.id
+        alumni_profile = getattr(user, 'alumni_profile', None)
+        if alumni_profile:
+            person_id = alumni_profile.person_id
 
         return Response({
             "status": "logged_in", 
             "user_id": user.id,
             "person_id": person_id,
-            "is_alumni": user.is_alumni,
+            "is_alumni": getattr(user, 'is_alumni', False),
             "is_staff": user.is_staff,
             "is_superuser": user.is_superuser
         })
