@@ -7,7 +7,6 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
-from ratelimit.decorators import ratelimit
 from .services import find_match
 from users.models import User
 from alumni.models import Person, AlumniAccount
@@ -17,7 +16,6 @@ from .serializers import RegisterAlumniSerializer, LoginSerializer, PasswordRese
 
 @extend_schema(request=RegisterAlumniSerializer, responses={200: dict})
 @api_view(['POST'])
-@ratelimit(key='ip', rate='10/m')
 def register_alumni(request):
     """
     Form-based registration workflow:
@@ -76,7 +74,6 @@ def register_alumni(request):
 
 @extend_schema(request=LoginSerializer, responses={200: dict})
 @api_view(['POST'])
-@ratelimit(key='ip', rate='10/m')
 def login_user(request):
     """
     Standard Login workflow:
