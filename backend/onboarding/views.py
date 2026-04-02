@@ -7,7 +7,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
-from django_ratelimit.decorators import ratelimit
+from ratelimit.decorators import ratelimit
 from .services import find_match
 from users.models import User
 from alumni.models import Person, AlumniAccount
