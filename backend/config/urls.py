@@ -16,13 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from onboarding import views
+from onboarding import views as onboarding_views
+from alumni import views as alumni_views
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/onboarding/register/', views.register_alumni, name='register_alumni'),
-    path('api/onboarding/login/', views.login_user, name='login_user'),
+    # Onboarding / Auth
+    path('api/onboarding/register/', onboarding_views.register_alumni, name='register_alumni'),
+    path('api/onboarding/login/', onboarding_views.login_user, name='login_user'),
+    path('api/onboarding/password-reset/', onboarding_views.password_reset, name='password_reset'),
+    path('api/onboarding/password-reset-confirm/', onboarding_views.password_reset_confirm, name='password_reset_confirm'),
+    
+    # Alumni
+    path('api/alumni/', alumni_views.list_alumni, name='list_alumni'),
+    
+    # API Docs
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
