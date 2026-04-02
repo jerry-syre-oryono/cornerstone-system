@@ -30,6 +30,8 @@ urlpatterns = [
     
     # Alumni
     path('api/alumni/', alumni_views.list_alumni, name='list_alumni'),
+    path('api/alumni/directory/', alumni_views.list_registered_alumni, name='list_registered_alumni'),
+
     
     # API Docs
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
