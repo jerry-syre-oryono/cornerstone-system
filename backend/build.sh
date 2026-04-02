@@ -7,6 +7,10 @@ pip install -r requirements.txt
 # Collect static files
 python manage.py collectstatic --no-input
 
+# Run pre-migration cleanup to ensure unique constraints can be applied
+echo "🧹 Cleaning up duplicates before migration..."
+python cleanup_before_migrate.py
+
 # Run migrations
 python manage.py migrate
 
