@@ -8,8 +8,8 @@ class AlumniAccountAdmin(admin.ModelAdmin):
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ['full_name', 'graduation_year', 'home_district', 'email', 'phone_primary', 'data_source']
-    list_filter = ['graduation_year', 'home_district', 'employment_status', 'data_source']
+    list_display = ['id', 'full_name', 'graduation_year', 'home_district', 'email', 'phone_primary', 'data_source', 'created_at']
+    list_filter = ['graduation_year', 'home_district', 'employment_status', 'data_source', 'created_at']
     search_fields = ['full_name', 'first_name', 'sir_name', 'email', 'home_district', 'place_of_work']
     readonly_fields = ['created_at', 'updated_at']
     
