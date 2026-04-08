@@ -10,9 +10,9 @@ from .serializers import UserSerializer
 @permission_classes([IsAuthenticated])
 def list_male_users(request):
     """
-    List all MALE registered users.
+    List all MALE users who have registered/onboarded.
     """
-    users = User.objects.filter(gender='M')
+    users = User.objects.filter(gender='M', alumni_profile__isnull=False)
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
 
@@ -21,8 +21,8 @@ def list_male_users(request):
 @permission_classes([IsAuthenticated])
 def list_female_users(request):
     """
-    List all FEMALE registered users.
+    List all FEMALE users who have registered/onboarded.
     """
-    users = User.objects.filter(gender='F')
+    users = User.objects.filter(gender='F', alumni_profile__isnull=False)
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)

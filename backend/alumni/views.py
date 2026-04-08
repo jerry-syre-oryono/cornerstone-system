@@ -21,9 +21,9 @@ def list_alumni(request):
 @permission_classes([IsAuthenticated])
 def list_male_alumni(request):
     """
-    List all MALE alumni.
+    List all MALE alumni who have NOT registered yet.
     """
-    alumni = Person.objects.filter(gender='M').prefetch_related('alumni_account')
+    alumni = Person.objects.filter(gender='M', alumni_account__isnull=True)
     serializer = AlumniListSerializer(alumni, many=True)
     return Response(serializer.data)
 
@@ -32,9 +32,9 @@ def list_male_alumni(request):
 @permission_classes([IsAuthenticated])
 def list_female_alumni(request):
     """
-    List all FEMALE alumni.
+    List all FEMALE alumni who have NOT registered yet.
     """
-    alumni = Person.objects.filter(gender='F').prefetch_related('alumni_account')
+    alumni = Person.objects.filter(gender='F', alumni_account__isnull=True)
     serializer = AlumniListSerializer(alumni, many=True)
     return Response(serializer.data)
 

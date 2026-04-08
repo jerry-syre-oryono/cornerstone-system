@@ -68,12 +68,12 @@ Authenticates a user via their email and password and creates an active server s
 
 ---
 
-## 3. List Alumni by Gender
-Returns a list of all alumni filtered by gender.
+## 3. List Alumni by Gender (UNREGISTERED)
+Returns a list of alumni who have **NOT yet registered** an account.
 
 **Endpoints:** 
-- `/api/alumni/male/` (All Male Alumni)
-- `/api/alumni/female/` (All Female Alumni)
+- `/api/alumni/male/` (Unregistered Male Alumni)
+- `/api/alumni/female/` (Unregistered Female Alumni)
 
 **Method:** `GET`  
 **Authentication & Permissions:** Authenticated user required.
@@ -88,19 +88,19 @@ Returns a list of all alumni filtered by gender.
     "graduation_year": 2020,
     "email": "john@example.com",
     "phone_primary": "123456789",
-    "status": "Signed Up"
+    "status": "Pending"
   }
 ]
 ```
 
 ---
 
-## 4. List Registered Users by Gender
-Returns a list of all registered system users filtered by gender.
+## 4. List Registered Users by Gender (ONBOARDED)
+Returns a list of users who have **successfully registered/onboarded**.
 
 **Endpoints:** 
-- `/api/users/male/` (All Male Users)
-- `/api/users/female/` (All Female Users)
+- `/api/users/male/` (Registered Male Users)
+- `/api/users/female/` (Registered Female Users)
 
 **Method:** `GET`  
 **Authentication & Permissions:** Authenticated user required.
