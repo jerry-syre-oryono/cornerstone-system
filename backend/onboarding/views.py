@@ -59,7 +59,8 @@ def register_alumni(request):
         password=password,
         first_name=person.first_name or "",
         last_name=person.sir_name or "",
-        is_alumni=True
+        is_alumni=True,
+        gender=person.gender  # Copy gender from alumni record
     )
 
     AlumniAccount.objects.create(user=user, person=person)

@@ -36,6 +36,17 @@ def get_existing_person(full_name, email, phone):
             
     return None
 
+def extract_gender(index_val):
+    """Extract gender from Index column (e.g. 96/B1 -> M, 07/G1 -> F)"""
+    if not index_val:
+        return None
+    val = str(index_val).upper()
+    if 'B' in val:
+        return 'M'
+    if 'G' in val:
+        return 'F'
+    return None
+
 def import_cosa_sheet(df, sheet_name):
     """Import COSA Combined sheet"""
     count = 0
@@ -45,6 +56,7 @@ def import_cosa_sheet(df, sheet_name):
             full_name = clean(row.get("Names"))
             first_name = clean(row.get("First Name"))
             sir_name = clean(row.get("Sir Name"))
+            index_num = clean(row.get("Index"))
             
             if not full_name and first_name:
                 full_name = first_name
@@ -64,6 +76,8 @@ def import_cosa_sheet(df, sheet_name):
                 "names": full_name,
                 "first_name": first_name,
                 "sir_name": sir_name,
+                "index_number": index_num,
+                "gender": extract_gender(index_num),
                 "graduation_year": clean_int(row.get("Year of Complition")),
                 "email": email,
                 "phone_primary": phone,
@@ -158,6 +172,7 @@ def import_youth_corps_sheet(df, sheet_name):
             names = clean(row.get("Names"))
             first_name = clean(row.get("First Name"))
             sir_name = clean(row.get("Sir Name"))
+            index_num = clean(row.get("Index"))
             full_name = names or f"{first_name} {sir_name}".strip()
             
             if not full_name:
@@ -173,6 +188,8 @@ def import_youth_corps_sheet(df, sheet_name):
                 "names": names,
                 "first_name": first_name,
                 "sir_name": sir_name,
+                "index_number": index_num,
+                "gender": extract_gender(index_num),
                 "graduation_year": clean_int(row.get("Year")),
                 "email": email,
                 "phone_primary": phone,
