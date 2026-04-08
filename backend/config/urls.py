@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from onboarding import views as onboarding_views
 from alumni import views as alumni_views
+from users import views as user_views
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
@@ -31,6 +32,12 @@ urlpatterns = [
     # Alumni
     path('api/alumni/', alumni_views.list_alumni, name='list_alumni'),
     path('api/alumni/directory/', alumni_views.list_registered_alumni, name='list_registered_alumni'),
+    path('api/alumni/male/', alumni_views.list_male_alumni, name='list_male_alumni'),
+    path('api/alumni/female/', alumni_views.list_female_alumni, name='list_female_alumni'),
+
+    # Users
+    path('api/users/male/', user_views.list_male_users, name='list_male_users'),
+    path('api/users/female/', user_views.list_female_users, name='list_female_users'),
 
     
     # API Docs

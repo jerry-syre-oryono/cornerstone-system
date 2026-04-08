@@ -2,12 +2,17 @@ from django.db import models
 
 class Person(models.Model):
     """Main alumni model - keep existing functionality"""
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+    ]
     # Keep your existing fields
     index_number = models.CharField(max_length=50, blank=True, null=True)
     names = models.CharField(max_length=255, blank=True, null=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     sir_name = models.CharField(max_length=100, blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     graduation_year = models.IntegerField(blank=True, null=True)
     course_offered = models.TextField(blank=True, null=True)
     home_district = models.CharField(max_length=100, blank=True, null=True)

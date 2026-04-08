@@ -97,22 +97,75 @@ python manage.py createsuperuser
 
 Once created, you can log in to the admin panel at `http://127.0.0.1:8000/admin/`.
 
-## 5. API Testing
+## 5. API Documentation & Testing
 
-Here are some `curl` commands to test the onboarding API endpoints.
+### 5.1. Interactive Swagger Docs
+Once the server is running, you can access the interactive API documentation at:
+- **Swagger UI**: [http://127.0.0.1:8000/api/docs/](http://127.0.0.1:8000/api/docs/)
+- **Redoc**: [http://127.0.0.1:8000/api/schema/](http://127.0.0.1:8000/api/schema/)
 
-### 5.1. Check if an Alumnus Exists
+### 5.2. Testing with Postman
 
+1. **Download Postman**: If you haven't already, download and install [Postman](https://www.postman.com/downloads/).
+2. **Create a New Collection**: Create a collection named "Cornerstone System" to group your requests.
+3. **Set Up Base URL Variable**:
+   - Go to your collection settings -> **Variables**.
+   - Add a variable named `base_url` with the value `http://127.0.0.1:8000`.
+4. **Testing Endpoints**:
+
+#### A. Register Alumni (POST)
+- **URL**: `{{base_url}}/api/onboarding/register/`
+- **Method**: `POST`
+- **Headers**: `Content-Type: application/json`
+- **Body (raw JSON)**:
+  ```json
+  {
+      "full_name": "John Doe",
+      "graduation_year": 2020,
+      "email": "john@example.com",
+      "password": "yourpassword123"
+  }
+  ```
+
+#### B. Login (POST)
+- **URL**: `{{base_url}}/api/onboarding/login/`
+- **Method**: `POST`
+- **Headers**: `Content-Type: application/json`
+- **Body (raw JSON)**:
+  ```json
+  {
+      "email": "john@example.com",
+      "password": "yourpassword123"
+  }
+  ```
+
+#### C. List Alumni (GET)
+- **URL**: `{{base_url}}/api/alumni/`
+- **Method**: `GET`
+- **Description**: Returns a list of all alumni records imported from the Excel database.
+
+#### D. Password Reset (POST)
+- **URL**: `{{base_url}}/api/onboarding/password-reset/`
+- **Method**: `POST`
+- **Headers**: `Content-Type: application/json`
+- **Body (raw JSON)**:
+  ```json
+  {
+      "email": "john@example.com"
+  }
+  ```
+
+### 5.3. Testing with curl
+
+#### Register Alumni
 ```bash
-curl -X POST http://localhost:8000/api/onboarding/check/ \
+curl -X POST http://localhost:8000/api/onboarding/register/ \
   -H "Content-Type: application/json" \
-  -d '{"full_name":"John Doe","graduation_year":2020}'
+  -d '{"full_name":"John Doe","graduation_year":2020,"email":"john@example.com","password":"yourpassword123"}'
 ```
 
-### 5.2. Submit an Email for an Alumnus
-
+#### List Alumni
 ```bash
-curl -X POST http://localhost:8000/api/onboarding/email/ \
-  -H "Content-Type: application/json" \
-  -d '{"person_id":1,"email":"test@example.com"}'
+curl -X GET http://localhost:8000/api/alumni/
 ```
+

@@ -7,12 +7,34 @@ from .serializers import AlumniListSerializer, RegisteredAlumniSerializer
 
 @extend_schema(responses={200: AlumniListSerializer(many=True)})
 @api_view(['GET'])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
 def list_alumni(request):
     """
-    List ALL alumni (registered and pending) for internal admin usage.
+    List ALL alumni (registered and pending).
     """
     alumni = Person.objects.all().prefetch_related('alumni_account')
+    serializer = AlumniListSerializer(alumni, many=True)
+    return Response(serializer.data)
+
+@extend_schema(responses={200: AlumniListSerializer(many=True)})
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_male_alumni(request):
+    """
+    List all MALE alumni.
+    """
+    alumni = Person.objects.filter(gender='M').prefetch_related('alumni_account')
+    serializer = AlumniListSerializer(alumni, many=True)
+    return Response(serializer.data)
+
+@extend_schema(responses={200: AlumniListSerializer(many=True)})
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_female_alumni(request):
+    """
+    List all FEMALE alumni.
+    """
+    alumni = Person.objects.filter(gender='F').prefetch_related('alumni_account')
     serializer = AlumniListSerializer(alumni, many=True)
     return Response(serializer.data)
 

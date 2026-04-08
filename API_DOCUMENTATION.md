@@ -68,6 +68,61 @@ Authenticates a user via their email and password and creates an active server s
 
 ---
 
+## 3. List Alumni by Gender
+Returns a list of all alumni filtered by gender.
+
+**Endpoints:** 
+- `/api/alumni/male/` (All Male Alumni)
+- `/api/alumni/female/` (All Female Alumni)
+
+**Method:** `GET`  
+**Authentication & Permissions:** Authenticated user required.
+
+### Responses
+**Success (200 OK):**  
+```json
+[
+  {
+    "id": 1,
+    "full_name": "John Doe",
+    "graduation_year": 2020,
+    "email": "john@example.com",
+    "phone_primary": "123456789",
+    "status": "Signed Up"
+  }
+]
+```
+
+---
+
+## 4. List Registered Users by Gender
+Returns a list of all registered system users filtered by gender.
+
+**Endpoints:** 
+- `/api/users/male/` (All Male Users)
+- `/api/users/female/` (All Female Users)
+
+**Method:** `GET`  
+**Authentication & Permissions:** Authenticated user required.
+
+### Responses
+**Success (200 OK):**  
+```json
+[
+  {
+    "id": 1,
+    "username": "jdoe",
+    "email": "john@example.com",
+    "first_name": "John",
+    "last_name": "Doe",
+    "is_alumni": true,
+    "gender": "M"
+  }
+]
+```
+
+---
+
 ## Rate Limiting
 - **Registration**: Limited to 10 requests per minute per IP.
 - **Login**: Limited to 10 requests per minute per IP.
