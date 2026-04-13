@@ -150,7 +150,8 @@ def list_pending_signup_requests(request):
 
 @extend_schema(
     tags=['Admin - Signup Requests'],
-    responses={200: dict},
+    request=None,
+    responses={200: OpenApiTypes.OBJECT},
     description="Approve a signup request. Creates User and Person records. Admin only."
 )
 @api_view(['POST'])
@@ -204,7 +205,8 @@ def approve_signup_request(request, pk):
 
 @extend_schema(
     tags=['Admin - Signup Requests'],
-    responses={200: dict},
+    request=None,
+    responses={200: OpenApiTypes.OBJECT},
     description="Reject a signup request. Admin only."
 )
 @api_view(['POST'])

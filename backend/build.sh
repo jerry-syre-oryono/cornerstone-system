@@ -12,6 +12,7 @@ echo "🧹 Cleaning up duplicates before migration..."
 python cleanup_before_migrate.py
 
 # Run migrations
+python manage.py makemigrations users --no-input
 python manage.py migrate
 
 # Create superuser if environment variable is set
