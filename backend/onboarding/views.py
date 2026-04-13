@@ -12,7 +12,8 @@ from .services import find_match
 from alumni.models import Person, AlumniAccount
 from .models import SignupRequest
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 from .serializers import (
     RegisterAlumniSerializer, LoginSerializer, PasswordResetSerializer, 
     PasswordResetConfirmSerializer, SignupRequestSerializer, 
@@ -21,7 +22,16 @@ from .serializers import (
 
 User = get_user_model()
 
-@extend_schema(request=RegisterAlumniSerializer, responses={200: dict})
+@extend_schema(
+    tags=['Auth & Onboarding'],
+    request=RegisterAlumniSerializer, 
+    responses={
+        200: dict,
+        202: dict,
+        400: dict
+    },
+    description="Registers an alumni. If the record is found, an account is created. If not found, a SignupRequest is created for admin review."
+)
 @api_view(['POST'])
 def register_alumni(request):
     """
@@ -106,7 +116,12 @@ def register_alumni(request):
         "is_superuser": user.is_superuser
     })
 
-@extend_schema(request=SignupRequestSerializer, responses={201: SignupRequestSerializer})
+@extend_schema(
+    tags=['Auth & Onboarding'],
+    request=SignupRequestSerializer, 
+    responses={201: SignupRequestSerializer},
+    description="Explicitly submit a signup request for admin review."
+)
 @api_view(['POST'])
 def submit_signup_request(request):
     """
@@ -118,7 +133,11 @@ def submit_signup_request(request):
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
 
-@extend_schema(responses={200: AdminSignupRequestSerializer(many=True)})
+@extend_schema(
+    tags=['Admin - Signup Requests'],
+    responses={200: AdminSignupRequestSerializer(many=True)},
+    description="List all pending signup requests. Admin only."
+)
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def list_pending_signup_requests(request):
@@ -129,7 +148,11 @@ def list_pending_signup_requests(request):
     serializer = AdminSignupRequestSerializer(requests, many=True)
     return Response(serializer.data)
 
-@extend_schema(responses={200: dict})
+@extend_schema(
+    tags=['Admin - Signup Requests'],
+    responses={200: dict},
+    description="Approve a signup request. Creates User and Person records. Admin only."
+)
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def approve_signup_request(request, pk):
@@ -179,7 +202,11 @@ def approve_signup_request(request, pk):
         "temporary_password": password 
     })
 
-@extend_schema(responses={200: dict})
+@extend_schema(
+    tags=['Admin - Signup Requests'],
+    responses={200: dict},
+    description="Reject a signup request. Admin only."
+)
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def reject_signup_request(request, pk):
@@ -199,7 +226,11 @@ def reject_signup_request(request, pk):
 
     return Response({"status": "rejected"})
 
-@extend_schema(responses={200: dict})
+@extend_schema(
+    tags=['Admin - User Management'],
+    responses={200: dict},
+    description="Get total count of registered users and alumni. Admin only."
+)
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def total_signed_up_users(request):
@@ -213,7 +244,12 @@ def total_signed_up_users(request):
         "total_alumni_users": total_alumni_users
     })
 
-@extend_schema(request=AdminCreateUserSerializer, responses={201: AdminCreateUserSerializer})
+@extend_schema(
+    tags=['Admin - User Management'],
+    request=AdminCreateUserSerializer, 
+    responses={201: AdminCreateUserSerializer},
+    description="Directly create a new user. Admin only."
+)
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def admin_create_user(request):
@@ -226,7 +262,12 @@ def admin_create_user(request):
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
 
-@extend_schema(request=LoginSerializer, responses={200: dict})
+@extend_schema(
+    tags=['Auth & Onboarding'],
+    request=LoginSerializer, 
+    responses={200: dict},
+    description="Login a user and return session details."
+)
 @api_view(['POST'])
 def login_user(request):
     """
@@ -261,7 +302,12 @@ def login_user(request):
     else:
         return Response({"error": "Invalid email or password."}, status=401)
 
-@extend_schema(request=PasswordResetSerializer, responses={200: dict})
+@extend_schema(
+    tags=['Auth & Onboarding'],
+    request=PasswordResetSerializer, 
+    responses={200: dict},
+    description="Initiate password reset process."
+)
 @api_view(['POST'])
 def password_reset(request):
     """
@@ -290,7 +336,12 @@ def password_reset(request):
 
     return Response({"status": "reset_email_sent_if_exists"})
 
-@extend_schema(request=PasswordResetConfirmSerializer, responses={200: dict})
+@extend_schema(
+    tags=['Auth & Onboarding'],
+    request=PasswordResetConfirmSerializer, 
+    responses={200: dict},
+    description="Confirm password reset with token."
+)
 @api_view(['POST'])
 def password_reset_confirm(request):
     """
