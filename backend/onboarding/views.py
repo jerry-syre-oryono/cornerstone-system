@@ -258,9 +258,16 @@ def total_signed_up_users(request):
     """
     total_users = User.objects.count()
     total_alumni_users = User.objects.filter(is_alumni=True).count()
+    male_users = User.objects.filter(gender='M').count()
+    female_users = User.objects.filter(gender='F').count()
+    unspecified_gender = User.objects.filter(gender__isnull=True).count()
+    
     return Response({
         "total_users": total_users,
-        "total_alumni_users": total_alumni_users
+        "total_alumni_users": total_alumni_users,
+        "male_users": male_users,
+        "female_users": female_users,
+        "unspecified_gender": unspecified_gender
     })
 
 @extend_schema(

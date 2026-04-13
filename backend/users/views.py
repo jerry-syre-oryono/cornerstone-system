@@ -12,7 +12,8 @@ def list_male_users(request):
     """
     List all MALE users who have registered/onboarded.
     """
-    users = User.objects.filter(gender='M', alumni_profile__isnull=False)
+    # Filter only by gender to include all registered users (Staff, Admins, and Alumni)
+    users = User.objects.filter(gender='M')
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
 
@@ -23,6 +24,7 @@ def list_female_users(request):
     """
     List all FEMALE users who have registered/onboarded.
     """
-    users = User.objects.filter(gender='F', alumni_profile__isnull=False)
+    # Filter only by gender to include all registered users (Staff, Admins, and Alumni)
+    users = User.objects.filter(gender='F')
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
