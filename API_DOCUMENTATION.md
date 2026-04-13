@@ -40,11 +40,6 @@ Creates a new `User` account linked to an existing `Person` record. If the alumn
 }
 ```
 
-**Errors (400):**
-- `400 Bad Request`: "Passwords do not match."
-- `400 Bad Request`: "A user with this email already exists."
-- `400 Bad Request`: "A signup request with this email already exists and is pending review."
-
 ---
 
 ## 2. Submit Signup Request
@@ -72,17 +67,6 @@ Approves a signup request, creates a `Person` and `User` record, and links them.
 **Method:** `POST`  
 **Authentication & Permissions:** Admin/Staff only.
 
-### Responses
-**Success (200 OK):**  
-```json
-{
-  "status": "approved",
-  "user_id": 13,
-  "person_id": 46,
-  "temporary_password": "random_password"
-}
-```
-
 ---
 
 ## 5. Reject Signup Request
@@ -94,7 +78,16 @@ Marks a signup request as `REJECTED`. The details remain in the `SignupRequest` 
 
 ---
 
-## 6. Total Signed Up Users
+## 6. Delete Signup Request
+Permanently removes a signup request from the database.
+
+**Endpoint:** `/api/onboarding/signup-requests/{id}/delete/`  
+**Method:** `DELETE`  
+**Authentication & Permissions:** Admin/Staff only.
+
+---
+
+## 7. Total Signed Up Users
 Returns counts of total users and total alumni users in the system.
 
 **Endpoint:** `/api/users/total/`  
@@ -103,7 +96,7 @@ Returns counts of total users and total alumni users in the system.
 
 ---
 
-## 7. Admin Add New User
+## 8. Admin Add New User
 Directly creates a new user in the system.
 
 **Endpoint:** `/api/users/create/`  
@@ -112,7 +105,7 @@ Directly creates a new user in the system.
 
 ---
 
-## 8. Login User
+## 9. Login User
 Authenticates a user via their email and password.
 
 **Endpoint:** `/api/onboarding/login/`  

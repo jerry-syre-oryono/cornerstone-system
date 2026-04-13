@@ -227,6 +227,25 @@ def reject_signup_request(request, pk):
     return Response({"status": "rejected"})
 
 @extend_schema(
+    tags=['Admin - Signup Requests'],
+    responses={204: None},
+    description="Delete a signup request permanently. Admin only."
+)
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def delete_signup_request(request, pk):
+    """
+    Permanently delete a signup request (Admin only).
+    """
+    try:
+        signup_request = SignupRequest.objects.get(pk=pk)
+    except SignupRequest.DoesNotExist:
+        return Response({"error": "Signup request not found."}, status=404)
+
+    signup_request.delete()
+    return Response(status=204)
+
+@extend_schema(
     tags=['Admin - User Management'],
     responses={200: dict},
     description="Get total count of registered users and alumni. Admin only."

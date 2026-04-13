@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/onboarding/signup-requests/pending/', onboarding_views.list_pending_signup_requests, name='list_pending_signup_requests'),
     path('api/onboarding/signup-requests/<int:pk>/approve/', onboarding_views.approve_signup_request, name='approve_signup_request'),
     path('api/onboarding/signup-requests/<int:pk>/reject/', onboarding_views.reject_signup_request, name='reject_signup_request'),
+    path('api/onboarding/signup-requests/<int:pk>/delete/', onboarding_views.delete_signup_request, name='delete_signup_request'),
     
     # User Management (New)
     path('api/users/total/', onboarding_views.total_signed_up_users, name='total_signed_up_users'),
