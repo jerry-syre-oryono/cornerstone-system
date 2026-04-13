@@ -1,5 +1,6 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.utils import timezone
 from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -9,9 +10,14 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .services import find_match
 from alumni.models import Person, AlumniAccount
+from .models import SignupRequest
 
 from drf_spectacular.utils import extend_schema
-from .serializers import RegisterAlumniSerializer, LoginSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer
+from .serializers import (
+    RegisterAlumniSerializer, LoginSerializer, PasswordResetSerializer, 
+    PasswordResetConfirmSerializer, SignupRequestSerializer, 
+    AdminSignupRequestSerializer, AdminCreateUserSerializer
+)
 
 User = get_user_model()
 
@@ -23,15 +29,23 @@ def register_alumni(request):
     - full_name, graduation_year, email, password, password_again
     - Verify password match
     - Find alumni match
-    - Create User and AlumniAccount link
-    - Set email on Person if missing
-    - Login
+    - IF MATCH FOUND:
+        - Create User and AlumniAccount link
+        - Set email on Person if missing
+        - Login
+    - IF NO MATCH FOUND:
+        - Create SignupRequest for Admin approval
     """
     full_name = request.data.get("full_name")
     graduation_year = request.data.get("graduation_year")
     email = request.data.get("email")
     password = request.data.get("password")
     password_again = request.data.get("password_again")
+    
+    # Optional fields for SignupRequest
+    phone = request.data.get("phone")
+    gender = request.data.get("gender")
+    course = request.data.get("course")
 
     if not all([full_name, graduation_year, email, password, password_again]):
         return Response({"error": "All fields are required."}, status=400)
@@ -39,15 +53,33 @@ def register_alumni(request):
     if password != password_again:
         return Response({"error": "Passwords do not match."}, status=400)
 
-    person = find_match(full_name, graduation_year)
-    if not person:
-        return Response({"error": "Alumni record not found. Please verify your name and graduation year."}, status=404)
-
-    if hasattr(person, 'alumni_account'):
-        return Response({"error": "Account already exists for this alumni record."}, status=400)
-
     if User.objects.filter(email=email).exists():
         return Response({"error": "A user with this email already exists."}, status=400)
+
+    person = find_match(full_name, graduation_year)
+    
+    if not person:
+        # Create a SignupRequest instead of failing
+        if SignupRequest.objects.filter(email=email).exists():
+            return Response({"error": "A signup request with this email already exists and is pending review."}, status=400)
+        
+        SignupRequest.objects.create(
+            full_name=full_name,
+            email=email,
+            graduation_year=graduation_year,
+            phone=phone,
+            gender=gender,
+            course=course,
+            status='PENDING'
+        )
+        return Response({
+            "status": "request_submitted",
+            "message": "Alumni record not found. Your details have been submitted for admin review."
+        }, status=202) # 202 Accepted
+
+    # Normal onboarding if person is found
+    if hasattr(person, 'alumni_account'):
+        return Response({"error": "Account already exists for this alumni record."}, status=400)
 
     if not person.email:
         person.email = email
@@ -60,7 +92,7 @@ def register_alumni(request):
         first_name=person.first_name or "",
         last_name=person.sir_name or "",
         is_alumni=True,
-        gender=person.gender  # Copy gender from alumni record
+        gender=person.gender or gender  # Use provided gender if record lacks it
     )
 
     AlumniAccount.objects.create(user=user, person=person)
@@ -73,6 +105,126 @@ def register_alumni(request):
         "is_staff": user.is_staff,
         "is_superuser": user.is_superuser
     })
+
+@extend_schema(request=SignupRequestSerializer, responses={201: SignupRequestSerializer})
+@api_view(['POST'])
+def submit_signup_request(request):
+    """
+    Explicitly submit a signup request (optional, can be used by a separate 'Contact Admin' form).
+    """
+    serializer = SignupRequestSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
+
+@extend_schema(responses={200: AdminSignupRequestSerializer(many=True)})
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def list_pending_signup_requests(request):
+    """
+    List all pending signup requests (Admin only).
+    """
+    requests = SignupRequest.objects.filter(status='PENDING')
+    serializer = AdminSignupRequestSerializer(requests, many=True)
+    return Response(serializer.data)
+
+@extend_schema(responses={200: dict})
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def approve_signup_request(request, pk):
+    """
+    Approve a signup request and create a User and Person record.
+    """
+    try:
+        signup_request = SignupRequest.objects.get(pk=pk)
+    except SignupRequest.DoesNotExist:
+        return Response({"error": "Signup request not found."}, status=404)
+    
+    if signup_request.status != 'PENDING':
+        return Response({"error": f"Request is already {signup_request.status}."}, status=400)
+
+    # Create Person record
+    person = Person.objects.create(
+        full_name=signup_request.full_name,
+        email=signup_request.email,
+        graduation_year=signup_request.graduation_year,
+        phone_primary=signup_request.phone,
+        gender=signup_request.gender,
+        course_offered=signup_request.course,
+        data_source="Signup Request"
+    )
+
+    # Create User record (using email as username)
+    password = User.objects.make_random_password()
+    user = User.objects.create_user(
+        username=signup_request.email,
+        email=signup_request.email,
+        password=password,
+        first_name=signup_request.full_name.split(' ')[0] if ' ' in signup_request.full_name else signup_request.full_name,
+        is_alumni=True,
+        gender=signup_request.gender
+    )
+
+    # Link them
+    AlumniAccount.objects.create(user=user, person=person)
+
+    signup_request.status = 'APPROVED'
+    signup_request.save()
+
+    return Response({
+        "status": "approved",
+        "user_id": user.id,
+        "person_id": person.id,
+        "temporary_password": password 
+    })
+
+@extend_schema(responses={200: dict})
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def reject_signup_request(request, pk):
+    """
+    Reject a signup request.
+    """
+    try:
+        signup_request = SignupRequest.objects.get(pk=pk)
+    except SignupRequest.DoesNotExist:
+        return Response({"error": "Signup request not found."}, status=404)
+
+    if signup_request.status != 'PENDING':
+        return Response({"error": f"Request is already {signup_request.status}."}, status=400)
+
+    signup_request.status = 'REJECTED'
+    signup_request.save()
+
+    return Response({"status": "rejected"})
+
+@extend_schema(responses={200: dict})
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def total_signed_up_users(request):
+    """
+    Get total count of signed up users/alumni.
+    """
+    total_users = User.objects.count()
+    total_alumni_users = User.objects.filter(is_alumni=True).count()
+    return Response({
+        "total_users": total_users,
+        "total_alumni_users": total_alumni_users
+    })
+
+@extend_schema(request=AdminCreateUserSerializer, responses={201: AdminCreateUserSerializer})
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def admin_create_user(request):
+    """
+    Admin-only API to add new users to the DB.
+    """
+    serializer = AdminCreateUserSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
 
 @extend_schema(request=LoginSerializer, responses={200: dict})
 @api_view(['POST'])

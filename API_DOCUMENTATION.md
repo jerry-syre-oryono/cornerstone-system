@@ -1,11 +1,11 @@
 # API Documentation: Onboarding & Authentication
 
-This document details the API endpoints for user authentication within the Cornerstone system.
+This document details the API endpoints for user authentication and management within the Cornerstone system.
 
 ---
 
 ## 1. Register Alumni
-Creates a new `User` account linked to an existing `Person` record.
+Creates a new `User` account linked to an existing `Person` record. If the alumni record is NOT found, it automatically creates a `SignupRequest` for admin review.
 
 **Endpoint:** `/api/onboarding/register/`  
 **Method:** `POST`  
@@ -14,14 +14,17 @@ Creates a new `User` account linked to an existing `Person` record.
 ### Request Payload (JSON)
 | Field | Type | Description |
 |---|---|---|
-| `full_name` | String | Exactly matches the existing alumni person name (using fuzzy matching, 80% similarity threshold). |
+| `full_name` | String | Exactly matches the existing alumni person name. |
 | `graduation_year` | Integer | The year the alumni graduated or completed their program. |
-| `email` | String | Valid email address. This will be assigned as their system login in the backend. |
+| `email` | String | Valid email address. This will be assigned as their system login. |
 | `password` | String | A secure password. |
 | `password_again` | String | A confirmation of the `password`. Must match. |
+| `phone` | String | (Optional) Phone number for SignupRequest. |
+| `gender` | String | (Optional) 'M' or 'F' for SignupRequest. |
+| `course` | String | (Optional) Course studied for SignupRequest. |
 
 ### Responses
-**Success (200 OK):**  
+**Success (200 OK):** (When alumni record is FOUND)
 ```json
 {
   "status": "account_created",
@@ -29,97 +32,92 @@ Creates a new `User` account linked to an existing `Person` record.
 }
 ```
 
-**Errors (400 / 404):**
-- `400 Bad Request`: "All fields are required." (Missing parameters)
+**Success (202 Accepted):** (When alumni record is NOT FOUND)
+```json
+{
+  "status": "request_submitted",
+  "message": "Alumni record not found. Your details have been submitted for admin review."
+}
+```
+
+**Errors (400):**
 - `400 Bad Request`: "Passwords do not match."
-- `400 Bad Request`: "Account already exists for this alumni." (They have already signed up)
 - `400 Bad Request`: "A user with this email already exists."
-- `404 Not Found`: "Alumni record not found. Please verify your name and graduation year." (No matching Name+Year in the `Person` model)
+- `400 Bad Request`: "A signup request with this email already exists and is pending review."
 
 ---
 
-## 2. Login User
-Authenticates a user via their email and password and creates an active server session.
+## 2. Submit Signup Request
+Explicitly submit a signup request. This is also handled automatically by the `/api/onboarding/register/` endpoint if a record isn't found.
 
-**Endpoint:** `/api/onboarding/login/`  
+**Endpoint:** `/api/onboarding/signup-request/`  
 **Method:** `POST`  
 **Authentication & Permissions:** None required
 
-### Request Payload (JSON)
-| Field | Type | Description |
-|---|---|---|
-| `email` | String | The email address they registered with. |
-| `password` | String | Their chosen password. |
+---
+
+## 3. List Pending Signup Requests
+Returns a list of all signup requests with status `PENDING`.
+
+**Endpoint:** `/api/onboarding/signup-requests/pending/`  
+**Method:** `GET`  
+**Authentication & Permissions:** Admin/Staff only.
+
+---
+
+## 4. Approve Signup Request
+Approves a signup request, creates a `Person` and `User` record, and links them.
+
+**Endpoint:** `/api/onboarding/signup-requests/{id}/approve/`  
+**Method:** `POST`  
+**Authentication & Permissions:** Admin/Staff only.
 
 ### Responses
 **Success (200 OK):**  
 ```json
 {
-  "status": "logged_in",
-  "user_id": 12,
-  "person_id": 45,
-  "is_alumni": true
+  "status": "approved",
+  "user_id": 13,
+  "person_id": 46,
+  "temporary_password": "random_password"
 }
 ```
 
-**Errors (400 / 401):**
-- `400 Bad Request`: "Email and password are required."
-- `401 Unauthorized`: "Invalid email or password."
+---
+
+## 5. Reject Signup Request
+Marks a signup request as `REJECTED`. The details remain in the `SignupRequest` table.
+
+**Endpoint:** `/api/onboarding/signup-requests/{id}/reject/`  
+**Method:** `POST`  
+**Authentication & Permissions:** Admin/Staff only.
 
 ---
 
-## 3. List Alumni by Gender (UNREGISTERED)
-Returns a list of alumni who have **NOT yet registered** an account.
+## 6. Total Signed Up Users
+Returns counts of total users and total alumni users in the system.
 
-**Endpoints:** 
-- `/api/alumni/male/` (Unregistered Male Alumni)
-- `/api/alumni/female/` (Unregistered Female Alumni)
-
+**Endpoint:** `/api/users/total/`  
 **Method:** `GET`  
-**Authentication & Permissions:** Authenticated user required.
-
-### Responses
-**Success (200 OK):**  
-```json
-[
-  {
-    "id": 1,
-    "full_name": "John Doe",
-    "graduation_year": 2020,
-    "email": "john@example.com",
-    "phone_primary": "123456789",
-    "status": "Pending"
-  }
-]
-```
+**Authentication & Permissions:** Admin/Staff only.
 
 ---
 
-## 4. List Registered Users by Gender (ONBOARDED)
-Returns a list of users who have **successfully registered/onboarded**.
+## 7. Admin Add New User
+Directly creates a new user in the system.
 
-**Endpoints:** 
-- `/api/users/male/` (Registered Male Users)
-- `/api/users/female/` (Registered Female Users)
+**Endpoint:** `/api/users/create/`  
+**Method:** `POST`  
+**Authentication & Permissions:** Admin/Staff only.
 
-**Method:** `GET`  
-**Authentication & Permissions:** Authenticated user required.
+---
 
-### Responses
-**Success (200 OK):**  
-```json
-[
-  {
-    "id": 1,
-    "username": "jdoe",
-    "email": "john@example.com",
-    "first_name": "John",
-    "last_name": "Doe",
-    "is_alumni": true,
-    "gender": "M"
-  }
-]
-```
+## 8. Login User
+Authenticates a user via their email and password.
+
+**Endpoint:** `/api/onboarding/login/`  
+**Method:** `POST`  
+**Authentication & Permissions:** None required
 
 ---
 

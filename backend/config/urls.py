@@ -29,6 +29,16 @@ urlpatterns = [
     path('api/onboarding/password-reset/', onboarding_views.password_reset, name='password_reset'),
     path('api/onboarding/password-reset-confirm/', onboarding_views.password_reset_confirm, name='password_reset_confirm'),
     
+    # Signup Requests (New)
+    path('api/onboarding/signup-request/', onboarding_views.submit_signup_request, name='submit_signup_request'),
+    path('api/onboarding/signup-requests/pending/', onboarding_views.list_pending_signup_requests, name='list_pending_signup_requests'),
+    path('api/onboarding/signup-requests/<int:pk>/approve/', onboarding_views.approve_signup_request, name='approve_signup_request'),
+    path('api/onboarding/signup-requests/<int:pk>/reject/', onboarding_views.reject_signup_request, name='reject_signup_request'),
+    
+    # User Management (New)
+    path('api/users/total/', onboarding_views.total_signed_up_users, name='total_signed_up_users'),
+    path('api/users/create/', onboarding_views.admin_create_user, name='admin_create_user'),
+
     # Alumni
     path('api/alumni/', alumni_views.list_alumni, name='list_alumni'),
     path('api/alumni/directory/', alumni_views.list_registered_alumni, name='list_registered_alumni'),
