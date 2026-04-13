@@ -178,6 +178,44 @@ Returns the full updated user object.
 
 ---
 
+## 11. Events API
+
+### Admin: Create Event
+**Endpoint:** `/api/events/admin/events/`  
+**Method:** `POST`  
+**Auth:** Admin Only  
+**Payload:**
+```json
+{
+  "title": "Annual Alumni Reunion",
+  "event_type": "Reunion",
+  "start_date": "2026-12-20T10:00:00Z",
+  "end_date": "2026-12-20T18:00:00Z",
+  "capacity": 200,
+  "location": "Main Hall, Campus",
+  "description": "Celebrating 20 years of excellence."
+}
+```
+
+### Admin: Update/Delete Event
+**Endpoint:** `/api/events/admin/events/{id}/`  
+**Method:** `PUT` / `PATCH` / `DELETE`  
+**Auth:** Admin Only  
+
+### User: List Events
+**Endpoint:** `/api/events/user/events/`  
+**Method:** `GET`  
+**Auth:** Public/Authenticated  
+Returns list of events with `rsvp_count` and `is_rsvped` (if authenticated).
+
+### User: RSVP to Event
+**Endpoint:** `/api/events/user/events/{id}/rsvp/`  
+**Method:** `POST`  
+**Auth:** Authenticated Users Only  
+Toggles RSVP. If already RSVPed, it removes the user from the event.
+
+---
+
 ## Rate Limiting
 - **Registration**: Limited to 10 requests per minute per IP.
 - **Login**: Limited to 10 requests per minute per IP.

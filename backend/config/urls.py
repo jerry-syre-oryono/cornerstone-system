@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from onboarding import views as onboarding_views
@@ -26,6 +26,9 @@ urlpatterns = [
     path('api/users/total/', onboarding_views.total_signed_up_users, name='total_signed_up_users'),
     path('api/users/create/', onboarding_views.admin_create_user, name='admin_create_user'),
     path('api/users/me/update/', user_views.update_profile, name='update_profile'),
+
+    # Events
+    path('api/events/', include('events.urls')),
 
     # Alumni
     path('api/alumni/', alumni_views.list_alumni, name='list_alumni'),

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'alumni',
     'onboarding',
     'careers',
+    'events',
     'drf_spectacular',
     'drf_spectacular_sidecar',
     'corsheaders',
