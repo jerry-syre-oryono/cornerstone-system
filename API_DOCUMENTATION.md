@@ -114,6 +114,70 @@ Authenticates a user via their email and password.
 
 ---
 
+## 10. Update User Profile
+Updates the currently authenticated user's profile across the 4 frontend interfaces. Supports both JSON and Multipart (for image uploads).
+
+**Endpoint:** `/api/users/me/update/`  
+**Method:** `PATCH` / `PUT`  
+**Authentication & Permissions:** Required (Authenticated user)
+
+### Request Payload (Multipart/Form-Data or JSON)
+
+#### Interface 1: Alumni Details
+| Field | Type | Description |
+|---|---|---|
+| `profile_photo` | File | Image file (max 2MB). |
+| `first_name` | String | User's first name. |
+| `last_name` | String | User's last name. |
+| `phone_number` | String | User's primary contact number. |
+| `gender` | String | 'M' for Male, 'F' for Female. |
+| `nationality` | String | User's country of citizenship. |
+| `bio` | String | Short professional or personal biography. |
+| `marital_status` | String | 'Single' or 'Married'. |
+| `spouse_full_name` | String | (Visible if Married) Full name of spouse. |
+| `spouse_phone` | String | (Visible if Married) Contact number of spouse. |
+| `spouse_email` | Email | (Visible if Married) Email address of spouse. |
+| `spouse_occupation`| String | (Visible if Married) Occupation of spouse. |
+
+#### Interface 2: Qualifications
+| Field | Type | Description |
+|---|---|---|
+| `cla_campus` | String | 'CLA Boys' or 'CLA Girls'. |
+| `high_school_graduation_year` | Integer | Year of graduation from CLA. |
+| `academic_status` | String | 'University Graduate', 'Still at University', or 'Not Enrolled'. |
+| `university_institution` | String | Name of the University/Institution. |
+| `university_course` | String | Course or Programme of study. |
+| `university_graduation_year` | Integer | (For Graduates) Year of graduation. |
+| `expected_graduation_year` | Integer | (For Students) Expected graduation year. |
+
+#### Interface 3: Address Details
+| Field | Type | Description |
+|---|---|---|
+| `address_country` | String | Country of residence. |
+| `address_district_region` | String | District, Region or Province. |
+| `address_city_town` | String | City or Town. |
+| `address_po_box` | String | (Optional) P.O. Box address. |
+| `address_physical_street` | String | Physical/Street address. |
+
+#### Interface 4: Work & Employment
+| Field | Type | Description |
+|---|---|---|
+| `employment_status` | String | 'Employed', 'Self-Employed', 'Unemployed', or 'Still a Student'. |
+| `employer_company_name` | String | Name of Employer or Business. |
+| `job_title_role` | String | Job Title or Role. |
+| `industry_sector` | String | Sector (e.g., Technology, Finance, Education, etc.). |
+| `work_location` | String | Physical location of work. |
+| `work_year_started` | Integer | Year started in this role/business. |
+| `work_email` | Email | (Optional) Work email address. |
+| `work_phone` | String | (Optional) Work phone number. |
+| `linkedin_profile` | URL | (Optional) Full LinkedIn profile URL. |
+
+### Responses
+**Success (200 OK):**
+Returns the full updated user object.
+
+---
+
 ## Rate Limiting
 - **Registration**: Limited to 10 requests per minute per IP.
 - **Login**: Limited to 10 requests per minute per IP.

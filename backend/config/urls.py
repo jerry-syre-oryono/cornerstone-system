@@ -1,9 +1,7 @@
-"""
-URL configuration for config project.
-...
-"""
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from onboarding import views as onboarding_views
 from alumni import views as alumni_views
 from users import views as user_views
@@ -39,8 +37,10 @@ urlpatterns = [
     path('api/users/male/', user_views.list_male_users, name='list_male_users'),
     path('api/users/female/', user_views.list_female_users, name='list_female_users'),
 
-    
     # API Docs
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

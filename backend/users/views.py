@@ -27,18 +27,25 @@ def list_female_users(request):
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
 
+from rest_framework.parsers import MultiPartParser, FormParser
+from .models import User
+from .serializers import UserSerializer, UserUpdateSerializer
+
 @extend_schema(
     request=UserUpdateSerializer,
     responses={200: UserSerializer},
-    description="Updates the current user's profile details (First Name, Last Name, Gender)."
+    description="Updates the current user's profile details across all 4 interfaces."
 )
 @api_view(['PATCH', 'PUT'])
 @permission_classes([IsAuthenticated])
 def update_profile(request):
     """
     Update details for the currently authenticated user.
+    Supports image uploads for profile_photo.
     """
     user = request.user
+    # Add parser_classes for image upload support if needed, 
+    # but for function based views we use the request.data which handles it
     serializer = UserUpdateSerializer(user, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
