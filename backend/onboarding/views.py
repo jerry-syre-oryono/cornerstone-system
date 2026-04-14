@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.authtoken.models import Token
 from django.utils import timezone
 from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -300,6 +301,7 @@ def admin_create_user(request):
 def login_user(request):
     """
     Standard Login workflow:
+    - returns token for Token Authentication
     - returns person_id via AlumniAccount relationship
     """
     email = request.data.get("email")
@@ -308,19 +310,30 @@ def login_user(request):
     if not email or not password:
         return Response({"error": "Email and password are required."}, status=400)
 
+    # Try authenticating with username=email (for alumni)
     user = authenticate(request, username=email, password=password)
+    
+    # If that fails, try finding a user by email and then authenticating with their username
+    if user is None:
+        user_obj = User.objects.filter(email=email).first()
+        if user_obj:
+            user = authenticate(request, username=user_obj.username, password=password)
 
     if user is not None:
         login(request, user)
         
+        token, _ = Token.objects.get_or_create(user=user)
+        
         # Safely try to get person_id via alumni_profile (AlumniAccount)
         person_id = None
+        # Use related_name from AlumniAccount if it exists, otherwise check manually
         alumni_profile = getattr(user, 'alumni_profile', None)
         if alumni_profile:
             person_id = alumni_profile.person_id
 
         return Response({
             "status": "logged_in", 
+            "token": token.key,
             "user_id": user.id,
             "person_id": person_id,
             "is_alumni": getattr(user, 'is_alumni', False),
