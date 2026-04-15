@@ -31,6 +31,16 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from .models import User
 from .serializers import UserSerializer, UserUpdateSerializer
 
+@extend_schema(responses={200: UserSerializer})
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_my_profile(request):
+    """
+    Get the profile of the currently authenticated user.
+    """
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
+
 @extend_schema(
     request=UserUpdateSerializer,
     responses={200: UserSerializer},

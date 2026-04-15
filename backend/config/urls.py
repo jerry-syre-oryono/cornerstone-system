@@ -25,6 +25,7 @@ urlpatterns = [
     # User Management (New)
     path('api/users/total/', onboarding_views.total_signed_up_users, name='total_signed_up_users'),
     path('api/users/create/', onboarding_views.admin_create_user, name='admin_create_user'),
+    path('api/users/me/', user_views.get_my_profile, name='get_my_profile'),
     path('api/users/me/update/', user_views.update_profile, name='update_profile'),
 
     # Events
