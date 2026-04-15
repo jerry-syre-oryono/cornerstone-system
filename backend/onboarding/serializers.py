@@ -7,7 +7,6 @@ User = get_user_model()
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-    role = serializers.ChoiceField(choices=[('admin', 'Admin'), ('alumni', 'Alumni')], required=False)
 
 class RegisterAlumniSerializer(serializers.Serializer):
     full_name = serializers.CharField()

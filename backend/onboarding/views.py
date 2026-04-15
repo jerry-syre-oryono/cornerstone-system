@@ -292,6 +292,36 @@ def admin_create_user(request):
     return Response(serializer.errors, status=400)
 
 @extend_schema(
+    tags=['Admin - User Management'],
+    request=dict,
+    responses={200: dict},
+    description="Promote or demote a user. Admin only."
+)
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def change_user_role(request, pk):
+    """
+    Change a user's role by setting is_staff and is_superuser.
+    """
+    try:
+        user_to_change = User.objects.get(pk=pk)
+        role = request.data.get("role") # 'admin' or 'alumni'
+
+        if role == 'admin':
+            user_to_change.is_staff = True
+            user_to_change.is_superuser = True
+        elif role == 'alumni':
+            user_to_change.is_staff = False
+            user_to_change.is_superuser = False
+        else:
+            return Response({"error": "Invalid role. Use 'admin' or 'alumni'."}, status=400)
+        
+        user_to_change.save()
+        return Response({"status": f"User {user_to_change.email} role changed to {role}."})
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=404)
+
+@extend_schema(
     tags=['Auth & Onboarding'],
     request=LoginSerializer, 
     responses={200: dict},
@@ -306,7 +336,6 @@ def login_user(request):
     """
     email = request.data.get("email")
     password = request.data.get("password")
-    requested_role = request.data.get("role")  # Optional: 'admin' or 'alumni'
 
     if not email or not password:
         return Response({"error": "Email and password are required."}, status=400)
@@ -332,27 +361,18 @@ def login_user(request):
         if alumni_profile:
             person_id = alumni_profile.person_id
 
-        # Determine available roles
-        available_roles = []
+        # Automatically determine role based on DB status
         if user.is_superuser or user.is_staff:
-            available_roles.append("admin")
-        if person_id:
-            available_roles.append("alumni")
-
-        # Set active role based on request or default
-        active_role = None
-        if requested_role in available_roles:
-            active_role = requested_role
-        elif available_roles:
-            active_role = available_roles[0] # Default to first available (usually admin)
+            role = "admin"
+        else:
+            role = "alumni"
 
         return Response({
             "status": "logged_in", 
             "token": token.key,
             "user_id": user.id,
             "person_id": person_id,
-            "role": active_role,
-            "roles": available_roles,
+            "role": role,
             "is_alumni": user.is_alumni or bool(person_id),
             "is_staff": user.is_staff,
             "is_superuser": user.is_superuser,
