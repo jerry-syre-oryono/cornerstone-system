@@ -306,6 +306,7 @@ def login_user(request):
     """
     email = request.data.get("email")
     password = request.data.get("password")
+    requested_role = request.data.get("role")  # Optional: 'admin' or 'alumni'
 
     if not email or not password:
         return Response({"error": "Email and password are required."}, status=400)
@@ -331,14 +332,34 @@ def login_user(request):
         if alumni_profile:
             person_id = alumni_profile.person_id
 
+        # Determine available roles
+        available_roles = []
+        if user.is_superuser or user.is_staff:
+            available_roles.append("admin")
+        if person_id:
+            available_roles.append("alumni")
+
+        # Set active role based on request or default
+        active_role = None
+        if requested_role in available_roles:
+            active_role = requested_role
+        elif available_roles:
+            active_role = available_roles[0] # Default to first available (usually admin)
+
         return Response({
             "status": "logged_in", 
             "token": token.key,
             "user_id": user.id,
             "person_id": person_id,
-            "is_alumni": getattr(user, 'is_alumni', False),
+            "role": active_role,
+            "roles": available_roles,
+            "is_alumni": user.is_alumni or bool(person_id),
             "is_staff": user.is_staff,
-            "is_superuser": user.is_superuser
+            "is_superuser": user.is_superuser,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "profile_photo": user.profile_photo.url if user.profile_photo else None,
         })
     else:
         return Response({"error": "Invalid email or password."}, status=401)
