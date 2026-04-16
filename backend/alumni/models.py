@@ -31,6 +31,7 @@ class Person(models.Model):
     best_communication_channel = models.CharField(max_length=255, blank=True, null=True)
     title_roles = models.TextField(blank=True, null=True)
     data_source = models.CharField(max_length=50, blank=True, null=True)
+    is_archived = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

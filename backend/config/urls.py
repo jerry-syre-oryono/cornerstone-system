@@ -23,6 +23,7 @@ urlpatterns = [
     path('api/onboarding/signup-requests/<int:pk>/delete/', onboarding_views.delete_signup_request, name='delete_signup_request'),
     
     # User Management (New)
+    path('api/users/dashboard-stats/', user_views.dashboard_stats, name='dashboard_stats'),
     path('api/users/total/', onboarding_views.total_signed_up_users, name='total_signed_up_users'),
     path('api/users/create/', onboarding_views.admin_create_user, name='admin_create_user'),
     path('api/users/<int:pk>/set-role/', onboarding_views.change_user_role, name='change_user_role'),
@@ -34,6 +35,11 @@ urlpatterns = [
 
     # Alumni
     path('api/alumni/', alumni_views.list_alumni, name='list_alumni'),
+    path('api/alumni/add/', alumni_views.add_alumni, name='add_alumni'),
+    path('api/alumni/<int:pk>/edit/', alumni_views.edit_alumni, name='edit_alumni'),
+    path('api/alumni/<int:pk>/archive/', alumni_views.archive_alumni, name='archive_alumni'),
+    path('api/alumni/<int:pk>/unarchive/', alumni_views.unarchive_alumni, name='unarchive_alumni'),
+    path('api/alumni/archived/', alumni_views.list_archived_alumni, name='list_archived_alumni'),
     path('api/alumni/directory/', alumni_views.list_registered_alumni, name='list_registered_alumni'),
     path('api/alumni/male/', alumni_views.list_male_alumni, name='list_male_alumni'),
     path('api/alumni/female/', alumni_views.list_female_alumni, name='list_female_alumni'),

@@ -1,9 +1,30 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from .models import User
 from .serializers import UserSerializer, UserUpdateSerializer
+from alumni.models import Person
+from onboarding.models import SignupRequest
+
+@extend_schema(responses={200: dict})
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def dashboard_stats(request):
+    """
+    Overview stats for admin dashboard.
+    """
+    stats = {
+        "total_alumni": Person.objects.count(),
+        "total_users_signed_up": User.objects.count(),
+        "total_male_users": User.objects.filter(gender='M').count(),
+        "total_female_users": User.objects.filter(gender='F').count(),
+        "total_at_university": User.objects.filter(academic_status='Still at University').count(),
+        "total_who_have_graduated": User.objects.filter(academic_status='University Graduate').count(),
+        "total_employed": User.objects.filter(employment_status__in=['Employed', 'Self-Employed']).count(),
+        "total_pending_approvals": SignupRequest.objects.filter(status='PENDING').count(),
+    }
+    return Response(stats)
 
 @extend_schema(responses={200: UserSerializer(many=True)})
 @api_view(['GET'])

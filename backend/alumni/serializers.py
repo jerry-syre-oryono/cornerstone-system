@@ -21,8 +21,16 @@ class AlumniListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Person
-        fields = ['id', 'full_name', 'graduation_year', 'email', 'phone_primary', 'status']
+        fields = ['id', 'full_name', 'graduation_year', 'email', 'phone_primary', 'status', 'is_archived']
 
     @extend_schema_field(serializers.CharField())
     def get_status(self, obj):
         return "Signed Up" if hasattr(obj, 'alumni_account') else "Pending"
+
+class PersonSerializer(serializers.ModelSerializer):
+    """
+    Full serializer for Person model for creating and editing records.
+    """
+    class Meta:
+        model = Person
+        fields = '__all__'

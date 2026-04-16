@@ -216,6 +216,70 @@ Toggles RSVP. If already RSVPed, it removes the user from the event.
 
 ---
 
+## 12. Alumni Management (Admin Only)
+
+### Add Alumni Record
+Adds a new alumni record to the database.
+
+**Endpoint:** `/api/alumni/add/`  
+**Method:** `POST`  
+**Authentication & Permissions:** Admin/Staff only.  
+**Payload:** Full `Person` object fields.
+
+### Edit Alumni Record
+Updates an existing alumni record.
+
+**Endpoint:** `/api/alumni/{id}/edit/`  
+**Method:** `PUT` / `PATCH`  
+**Authentication & Permissions:** Admin/Staff only.  
+**Payload:** Fields to update.
+
+### Archive Alumni Record
+Changes an alumni's status to archived. Archived records are hidden from the main alumni list.
+
+**Endpoint:** `/api/alumni/{id}/archive/`  
+**Method:** `POST`  
+**Authentication & Permissions:** Admin/Staff only.
+
+### Unarchive Alumni Record
+Restores an archived alumni record to active status.
+
+**Endpoint:** `/api/alumni/{id}/unarchive/`  
+**Method:** `POST`  
+**Authentication & Permissions:** Admin/Staff only.
+
+### List Archived Alumni
+Returns a list of all archived alumni records.
+
+**Endpoint:** `/api/alumni/archived/`  
+**Method:** `GET`  
+**Authentication & Permissions:** Admin/Staff only.
+
+---
+
+## 13. Dashboard Statistics (Admin Only)
+Returns high-level overview statistics for the admin dashboard.
+
+**Endpoint:** `/api/users/dashboard-stats/`  
+**Method:** `GET`  
+**Authentication & Permissions:** Admin/Staff only.
+
+### Response Payload (JSON)
+```json
+{
+  "total_alumni": 1250,
+  "total_users_signed_up": 450,
+  "total_male_users": 210,
+  "total_female_users": 240,
+  "total_at_university": 150,
+  "total_who_have_graduated": 300,
+  "total_employed": 280,
+  "total_pending_approvals": 15
+}
+```
+
+---
+
 ## Rate Limiting
 - **Registration**: Limited to 10 requests per minute per IP.
 - **Login**: Limited to 10 requests per minute per IP.
