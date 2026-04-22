@@ -8,6 +8,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.conf import settings
 from .services import find_match
 from alumni.models import Person, AlumniAccount
@@ -413,7 +415,7 @@ def password_reset(request):
         message = f"Use the following to reset your password:\n{reset_link}"
         
         try:
-            send_mail(subject, message, settings.EMAIL_HOST_USER, [email], fail_silently=False)
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email], fail_silently=False)
         except Exception as e:
             # For local dev if email fails, we return it in response for convenience
             return Response({"status": "sent_locally", "uid": uid, "token": token, "info": str(e)})
@@ -492,10 +494,19 @@ def request_password_reset_otp(request):
     )
 
     subject = "Your Password Reset OTP"
-    message = f"Your OTP for password reset is: {otp}\nThis OTP is valid for 10 minutes. If you did not request a password reset, please ignore this email."
+    context = {"otp": otp}
+    html_message = render_to_string("onboarding/emails/password_reset_otp.html", context)
+    plain_message = strip_tags(html_message)
     
     try:
-        send_mail(subject, message, settings.EMAIL_HOST_USER, [email], fail_silently=False)
+        send_mail(
+            subject, 
+            plain_message, 
+            settings.DEFAULT_FROM_EMAIL, 
+            [email], 
+            html_message=html_message,
+            fail_silently=False
+        )
     except Exception as e:
         return Response({
             "status": "otp_sent_dev",

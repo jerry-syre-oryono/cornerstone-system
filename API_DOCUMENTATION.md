@@ -114,7 +114,40 @@ Authenticates a user via their email and password.
 
 ---
 
-## 10. Update User Profile
+## 10. Password Reset (OTP Flow)
+
+### Step 1: Request OTP
+Generates a 6-digit OTP and sends it to the user's email.
+
+**Endpoint:** `/api/onboarding/password-reset-otp/`  
+**Method:** `POST`  
+**Payload:** `{"email": "user@example.com"}`
+
+### Step 2: Verify OTP
+Validates the OTP sent to the email.
+
+**Endpoint:** `/api/onboarding/password-reset-verify/`  
+**Method:** `POST`  
+**Payload:** `{"email": "user@example.com", "otp": "123456"}`
+
+### Step 3: Set New Password
+Sets a new password using the verified OTP.
+
+**Endpoint:** `/api/onboarding/password-reset-set-password/`  
+**Method:** `POST`  
+**Payload:** 
+```json
+{
+  "email": "user@example.com",
+  "otp": "123456",
+  "new_password": "newpassword123",
+  "new_password_again": "newpassword123"
+}
+```
+
+---
+
+## 11. Update User Profile
 Updates the currently authenticated user's profile across the 4 frontend interfaces. Supports both JSON and Multipart (for image uploads).
 
 **Endpoint:** `/api/users/me/update/`  

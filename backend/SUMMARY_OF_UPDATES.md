@@ -40,3 +40,20 @@ This document summarizes the architectural and functional updates made to the Co
 
 ---
 *Date: April 1, 2026*
+
+## 5. SMTP & Email System Update (April 22, 2026)
+### SMTP Configuration
+- Configured production SMTP settings using `mail.mak.ac.ug`.
+- Updated `backend/config/settings.py` to use environment-aware defaults for email hosting, port, and credentials.
+- Set `DEFAULT_FROM_EMAIL` to "Cornerstone System <syre.jerry@mak.ac.ug>".
+
+### Password Reset Enhancements
+- **OTP Flow**: Implemented a 3-step OTP-based password reset flow (Request -> Verify -> Set).
+- **Professional Email Templates**:
+  - Created a modern, responsive HTML email template for OTP delivery (`onboarding/templates/onboarding/emails/password_reset_otp.html`).
+  - Features include high-contrast headers, clear OTP display, and mobile-friendly styling.
+- **View Integration**: Updated `onboarding/views.py` to render and send multi-part (HTML + Plain Text) emails using Django's template engine.
+
+### Documentation & Environment
+- Updated `.env.example` with the latest SMTP configuration variables.
+- Added comprehensive documentation for the Password Reset OTP API endpoints in `API_DOCUMENTATION.md`.
