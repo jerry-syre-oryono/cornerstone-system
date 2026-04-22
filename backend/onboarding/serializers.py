@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SignupRequest
+from .models import SignupRequest, PasswordResetOTP
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -27,6 +27,24 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     token = serializers.CharField()
     new_password = serializers.CharField(write_only=True)
     new_password_again = serializers.CharField(write_only=True)
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+class PasswordResetVerifyOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=6)
+
+class PasswordResetSetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=6)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+    new_password_again = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, data):
+        if data['new_password'] != data['new_password_again']:
+            raise serializers.ValidationError({"new_password_again": "Passwords do not match."})
+        return data
 
 class SignupRequestSerializer(serializers.ModelSerializer):
     class Meta:

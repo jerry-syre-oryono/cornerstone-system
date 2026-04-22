@@ -155,6 +155,46 @@ Once the server is running, you can access the interactive API documentation at:
   }
   ```
 
+#### E. OTP Password Reset - Request OTP (POST)
+- **URL**: `{{base_url}}/api/onboarding/password-reset/request-otp/`
+- **Method**: `POST`
+- **Headers**: `Content-Type: application/json`
+- **Description**: Request a 6-digit OTP to reset password. The OTP will be sent to the user's email. In development mode (if email fails), the OTP is returned in the response.
+- **Body (raw JSON)**:
+  ```json
+  {
+      "email": "john@example.com"
+  }
+  ```
+
+#### F. OTP Password Reset - Verify OTP (POST)
+- **URL**: `{{base_url}}/api/onboarding/password-reset/verify-otp/`
+- **Method**: `POST`
+- **Headers**: `Content-Type: application/json`
+- **Description**: Verify the OTP sent to the user's email.
+- **Body (raw JSON)**:
+  ```json
+  {
+      "email": "john@example.com",
+      "otp": "123456"
+  }
+  ```
+
+#### G. OTP Password Reset - Set New Password (POST)
+- **URL**: `{{base_url}}/api/onboarding/password-reset/set-password/`
+- **Method**: `POST`
+- **Headers**: `Content-Type: application/json`
+- **Description**: Set a new password after OTP verification.
+- **Body (raw JSON)**:
+  ```json
+  {
+      "email": "john@example.com",
+      "otp": "123456",
+      "new_password": "newpassword123",
+      "new_password_again": "newpassword123"
+  }
+  ```
+
 ### 5.3. Testing with curl
 
 #### Register Alumni

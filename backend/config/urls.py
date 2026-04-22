@@ -15,6 +15,11 @@ urlpatterns = [
     path('api/onboarding/password-reset/', onboarding_views.password_reset, name='password_reset'),
     path('api/onboarding/password-reset-confirm/', onboarding_views.password_reset_confirm, name='password_reset_confirm'),
     
+    # OTP Password Reset (New)
+    path('api/onboarding/password-reset/request-otp/', onboarding_views.request_password_reset_otp, name='request_password_reset_otp'),
+    path('api/onboarding/password-reset/verify-otp/', onboarding_views.verify_password_reset_otp, name='verify_password_reset_otp'),
+    path('api/onboarding/password-reset/set-password/', onboarding_views.set_password_with_otp, name='set_password_with_otp'),
+    
     # Signup Requests (New)
     path('api/onboarding/signup-request/', onboarding_views.submit_signup_request, name='submit_signup_request'),
     path('api/onboarding/signup-requests/pending/', onboarding_views.list_pending_signup_requests, name='list_pending_signup_requests'),

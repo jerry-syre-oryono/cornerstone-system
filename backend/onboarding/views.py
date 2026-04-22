@@ -18,7 +18,9 @@ from drf_spectacular.types import OpenApiTypes
 from .serializers import (
     RegisterAlumniSerializer, LoginSerializer, PasswordResetSerializer, 
     PasswordResetConfirmSerializer, SignupRequestSerializer, 
-    AdminSignupRequestSerializer, AdminCreateUserSerializer
+    AdminSignupRequestSerializer, AdminCreateUserSerializer,
+    PasswordResetRequestSerializer, PasswordResetVerifyOTPSerializer,
+    PasswordResetSetPasswordSerializer
 )
 
 User = get_user_model()
@@ -452,3 +454,147 @@ def password_reset_confirm(request):
         return Response({"status": "password_reset_success"})
     else:
         return Response({"error": "Invalid reset link or token."}, status=400)
+
+import random
+from datetime import timedelta
+from django.core.cache import cache
+
+@extend_schema(
+    tags=['Auth & Onboarding - OTP Password Reset'],
+    request=PasswordResetRequestSerializer,
+    responses={200: dict},
+    description="Step 1: Request OTP for password reset. An OTP will be sent to the user's email."
+)
+@api_view(['POST'])
+def request_password_reset_otp(request):
+    """
+    Step 1: Request OTP for password reset.
+    Generates a 6-digit OTP and sends it to the user's email.
+    """
+    email = request.data.get("email")
+    if not email:
+        return Response({"error": "Email is required."}, status=400)
+
+    user = User.objects.filter(email=email).first()
+    if not user:
+        return Response({"status": "otp_sent", "message": "If an account with that email exists, an OTP has been sent."})
+
+    otp = str(random.randint(100000, 999999))
+    expires_at = timezone.now() + timedelta(minutes=10)
+
+    PasswordResetOTP.objects.filter(email=email).delete()
+    PasswordResetOTP.objects.create(
+        email=email,
+        otp=otp,
+        expires_at=expires_at,
+        is_used=False,
+        is_verified=False
+    )
+
+    subject = "Your Password Reset OTP"
+    message = f"Your OTP for password reset is: {otp}\nThis OTP is valid for 10 minutes. If you did not request a password reset, please ignore this email."
+    
+    try:
+        send_mail(subject, message, settings.EMAIL_HOST_USER, [email], fail_silently=False)
+    except Exception as e:
+        return Response({
+            "status": "otp_sent_dev",
+            "otp": otp,
+            "message": f"Email service failed. Your OTP is: {otp}",
+            "debug_info": str(e)
+        })
+
+    return Response({"status": "otp_sent", "message": "If an account with that email exists, an OTP has been sent."})
+
+@extend_schema(
+    tags=['Auth & Onboarding - OTP Password Reset'],
+    request=PasswordResetVerifyOTPSerializer,
+    responses={200: dict},
+    description="Step 2: Verify the OTP sent to the user's email."
+)
+@api_view(['POST'])
+def verify_password_reset_otp(request):
+    """
+    Step 2: Verify the OTP.
+    Marks the OTP as verified so it can be used to reset the password.
+    """
+    email = request.data.get("email")
+    otp = request.data.get("otp")
+
+    if not email or not otp:
+        return Response({"error": "Email and OTP are required."}, status=400)
+
+    otp_record = PasswordResetOTP.objects.filter(
+        email=email, 
+        otp=otp, 
+        is_used=False
+    ).order_by('-created_at').first()
+
+    if not otp_record:
+        return Response({"error": "Invalid OTP."}, status=400)
+
+    if otp_record.is_verified:
+        return Response({"error": "OTP has already been used."}, status=400)
+
+    if timezone.now() > otp_record.expires_at:
+        return Response({"error": "OTP has expired. Please request a new one."}, status=400)
+
+    otp_record.is_verified = True
+    otp_record.save()
+
+    return Response({
+        "status": "otp_verified",
+        "message": "OTP verified successfully. You can now set a new password."
+    })
+
+@extend_schema(
+    tags=['Auth & Onboarding - OTP Password Reset'],
+    request=PasswordResetSetPasswordSerializer,
+    responses={200: dict},
+    description="Step 3: Set a new password using the verified OTP."
+)
+@api_view(['POST'])
+def set_password_with_otp(request):
+    """
+    Step 3: Set new password using verified OTP.
+    """
+    email = request.data.get("email")
+    otp = request.data.get("otp")
+    new_password = request.data.get("new_password")
+    new_password_again = request.data.get("new_password_again")
+
+    if not all([email, otp, new_password, new_password_again]):
+        return Response({"error": "All fields are required."}, status=400)
+
+    if new_password != new_password_again:
+        return Response({"error": "Passwords do not match."}, status=400)
+
+    otp_record = PasswordResetOTP.objects.filter(
+        email=email, 
+        otp=otp, 
+        is_used=False
+    ).order_by('-created_at').first()
+
+    if not otp_record:
+        return Response({"error": "Invalid OTP."}, status=400)
+
+    if not otp_record.is_verified:
+        return Response({"error": "OTP has not been verified. Please verify the OTP first."}, status=400)
+
+    if timezone.now() > otp_record.expires_at:
+        return Response({"error": "OTP has expired. Please request a new one."}, status=400)
+
+    user = User.objects.filter(email=email).first()
+    if not user:
+        return Response({"error": "User not found."}, status=404)
+
+    user.set_password(new_password)
+    user.save()
+
+    otp_record.is_used = True
+    otp_record.save()
+
+    return Response({
+        "status": "password_reset_success",
+        "message": "Your password has been reset successfully."
+    })
