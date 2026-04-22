@@ -1,3 +1,6 @@
+import random
+from datetime import timedelta
+from django.core.cache import cache
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -13,7 +16,7 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from .services import find_match
 from alumni.models import Person, AlumniAccount
-from .models import SignupRequest
+from .models import SignupRequest, PasswordResetOTP
 
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
@@ -456,10 +459,6 @@ def password_reset_confirm(request):
         return Response({"status": "password_reset_success"})
     else:
         return Response({"error": "Invalid reset link or token."}, status=400)
-
-import random
-from datetime import timedelta
-from django.core.cache import cache
 
 @extend_schema(
     tags=['Auth & Onboarding - OTP Password Reset'],
