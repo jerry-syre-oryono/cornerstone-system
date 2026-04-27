@@ -34,3 +34,17 @@ class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = '__all__'
+
+class AdminAddAlumniSerializer(serializers.ModelSerializer):
+    """
+    Serializer for admin adding new alumni with minimal required fields.
+    Additional fields can be updated later by the alumni themselves.
+    """
+    class Meta:
+        model = Person
+        fields = [
+            'index_number', 'names', 'first_name', 'sir_name', 'full_name',
+            'gender', 'graduation_year', 'course_offered', 'home_district',
+            'district_of_residence', 'village_residence', 'email', 'phone_primary',
+            'data_source'
+        ]

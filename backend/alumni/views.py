@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from .models import Person
-from .serializers import AlumniListSerializer, RegisteredAlumniSerializer, PersonSerializer
+from .serializers import AlumniListSerializer, RegisteredAlumniSerializer, PersonSerializer, AdminAddAlumniSerializer
 
 @extend_schema(responses={200: AlumniListSerializer(many=True)})
 @api_view(['GET'])
@@ -27,14 +27,14 @@ def list_archived_alumni(request):
     serializer = AlumniListSerializer(alumni, many=True)
     return Response(serializer.data)
 
-@extend_schema(request=PersonSerializer, responses={201: PersonSerializer})
+@extend_schema(request=AdminAddAlumniSerializer, responses={201: PersonSerializer})
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def add_alumni(request):
     """
     Add a new alumni record. Admin only.
     """
-    serializer = PersonSerializer(data=request.data)
+    serializer = AdminAddAlumniSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=201)
