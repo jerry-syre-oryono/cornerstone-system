@@ -9,7 +9,12 @@ if __name__ == "__main__":
 
 from alumni.models import Person
 from careers.models import Opportunity
-from django.db import IntegrityError
+from django.db import IntegrityError, DataError
+
+def truncate(val, length):
+    if val and len(str(val)) > length:
+        return str(val)[:length]
+    return val
 
 def run():
     file_path = 'transfer_data.json'
@@ -39,41 +44,51 @@ def run():
             phone = fields.get('phone_primary')
             full_name = fields.get('full_name')
             
+            # Truncate fields that have max_length in the model
+            fields['phone_primary'] = truncate(fields.get('phone_primary'), 50)
+            fields['phone_secondary'] = truncate(fields.get('phone_secondary'), 50)
+            fields['index_number'] = truncate(fields.get('index_number'), 50)
+            fields['employment_status'] = truncate(fields.get('employment_status'), 50)
+            fields['marital_status'] = truncate(fields.get('marital_status'), 50)
+            fields['data_source'] = truncate(fields.get('data_source'), 50)
+            fields['full_name'] = truncate(fields.get('full_name'), 255)
+            fields['first_name'] = truncate(fields.get('first_name'), 100)
+            fields['sir_name'] = truncate(fields.get('sir_name'), 100)
+
             # Smart Matching
             person = None
             if email:
                 person = Person.objects.filter(email=email).first()
-            if not person and phone:
-                person = Person.objects.filter(phone_primary=phone).first()
+            if not person and fields['phone_primary']:
+                person = Person.objects.filter(phone_primary=fields['phone_primary']).first()
             if not person and full_name:
                 person = Person.objects.filter(full_name__iexact=full_name).first()
                 
             if person:
-                # Update existing fields if they are not None in the JSON
+                # Update existing fields
                 for key, value in fields.items():
                     if value is not None:
                         setattr(person, key, value)
                 try:
                     person.save()
                     person_updated += 1
-                except IntegrityError:
+                except (IntegrityError, DataError) as e:
+                    print(f"Skipping update for {full_name}: {e}")
                     continue
             else:
                 # Create new
                 try:
                     Person.objects.create(**fields)
                     person_created += 1
-                except IntegrityError:
+                except (IntegrityError, DataError) as e:
+                    print(f"Skipping creation for {full_name}: {e}")
                     continue
                     
         elif model == 'careers.opportunity':
             title = fields.get('title')
             org = fields.get('organisation')
-            # For simplicity, we skip existing opportunities by title/org
             if not Opportunity.objects.filter(title=title, organisation=org).exists():
                 try:
-                    # Remove posted_by for now to avoid User matching issues during transfer
-                    # It will be null or can be set manually in admin
                     fields.pop('posted_by', None) 
                     Opportunity.objects.create(**fields)
                     opp_created += 1
