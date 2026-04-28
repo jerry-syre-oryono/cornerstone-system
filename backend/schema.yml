@@ -1,0 +1,2790 @@
+openapi: 3.0.3
+info:
+  title: Cornerstone Alumni System API
+  version: 1.0.0
+  description: API documentation for the Cornerstone Alumni management system.
+paths:
+  /api/alumni/:
+    get:
+      operationId: alumni_list
+      description: List ALL ACTIVE alumni (registered and pending).
+      tags:
+      - alumni
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlumniList'
+          description: ''
+  /api/alumni/{id}/archive/:
+    post:
+      operationId: alumni_archive_create
+      description: Archive an alumni record. Admin only.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - alumni
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlumniStatusResponse'
+          description: ''
+  /api/alumni/{id}/edit/:
+    put:
+      operationId: alumni_edit_update
+      description: Edit an existing alumni record. Admin only.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - alumni
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PersonRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PersonRequest'
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+    patch:
+      operationId: alumni_edit_partial_update
+      description: Edit an existing alumni record. Admin only.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - alumni
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPersonRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPersonRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPersonRequest'
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+  /api/alumni/{id}/unarchive/:
+    post:
+      operationId: alumni_unarchive_create
+      description: Unarchive an alumni record. Admin only.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - alumni
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlumniStatusResponse'
+          description: ''
+  /api/alumni/add/:
+    post:
+      operationId: alumni_add_create
+      description: Add a new alumni record. Admin only.
+      tags:
+      - alumni
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminAddAlumniRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminAddAlumniRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminAddAlumniRequest'
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+  /api/alumni/archived/:
+    get:
+      operationId: alumni_archived_list
+      description: List ALL ARCHIVED alumni. Admin only.
+      tags:
+      - alumni
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlumniList'
+          description: ''
+  /api/alumni/directory/:
+    get:
+      operationId: alumni_directory_list
+      description: |-
+        Public-facing alumni directory.
+        Only shows alumni who have successfully registered an account.
+      tags:
+      - alumni
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegisteredAlumni'
+          description: ''
+  /api/alumni/female/:
+    get:
+      operationId: alumni_female_list
+      description: List all FEMALE alumni who have NOT registered yet.
+      tags:
+      - alumni
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlumniList'
+          description: ''
+  /api/alumni/male/:
+    get:
+      operationId: alumni_male_list
+      description: List all MALE alumni who have NOT registered yet.
+      tags:
+      - alumni
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlumniList'
+          description: ''
+  /api/events/admin/events/:
+    get:
+      operationId: events_admin_events_list
+      tags:
+      - events
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+    post:
+      operationId: events_admin_events_create
+      description: 'Admin: Create a new event.'
+      tags:
+      - events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+  /api/events/admin/events/{id}/:
+    get:
+      operationId: events_admin_events_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this event.
+        required: true
+      tags:
+      - events
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+    put:
+      operationId: events_admin_events_update
+      description: 'Admin: Update an event.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this event.
+        required: true
+      tags:
+      - events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+    patch:
+      operationId: events_admin_events_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this event.
+        required: true
+      tags:
+      - events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEventRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEventRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEventRequest'
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+    delete:
+      operationId: events_admin_events_destroy
+      description: 'Admin: Delete an event.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this event.
+        required: true
+      tags:
+      - events
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/events/user/events/:
+    get:
+      operationId: events_user_events_list
+      description: 'User: List all upcoming events.'
+      tags:
+      - events
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+  /api/events/user/events/{event_id}/rsvp/:
+    post:
+      operationId: events_user_events_rsvp_create
+      description: 'User: RSVP to an event. If already RSVPed, it will toggle/remove
+        the RSVP.'
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - events
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RSVPResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RSVPResponse'
+          description: ''
+  /api/onboarding/login/:
+    post:
+      operationId: onboarding_login_create
+      description: Login a user and return session details.
+      tags:
+      - Auth & Onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/onboarding/password-reset/:
+    post:
+      operationId: onboarding_password_reset_create
+      description: Initiate password reset process.
+      tags:
+      - Auth & Onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/onboarding/password-reset-confirm/:
+    post:
+      operationId: onboarding_password_reset_confirm_create
+      description: Confirm password reset with token.
+      tags:
+      - Auth & Onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/onboarding/password-reset/request-otp/:
+    post:
+      operationId: onboarding_password_reset_request_otp_create
+      description: 'Step 1: Request OTP for password reset. An OTP will be sent to
+        the user''s email.'
+      tags:
+      - Auth & Onboarding - OTP Password Reset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/onboarding/password-reset/set-password/:
+    post:
+      operationId: onboarding_password_reset_set_password_create
+      description: 'Step 3: Set a new password using the verified OTP.'
+      tags:
+      - Auth & Onboarding - OTP Password Reset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetSetPasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetSetPasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetSetPasswordRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/onboarding/password-reset/verify-otp/:
+    post:
+      operationId: onboarding_password_reset_verify_otp_create
+      description: 'Step 2: Verify the OTP sent to the user''s email.'
+      tags:
+      - Auth & Onboarding - OTP Password Reset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetVerifyOTPRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetVerifyOTPRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetVerifyOTPRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/onboarding/register/:
+    post:
+      operationId: onboarding_register_create
+      description: Registers an alumni. If the record is found, an account is created.
+        If not found, a SignupRequest is created for admin review.
+      tags:
+      - Auth & Onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterAlumniRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegisterAlumniRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegisterAlumniRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+        '202':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/onboarding/signup-request/:
+    post:
+      operationId: onboarding_signup_request_create
+      description: Explicitly submit a signup request for admin review.
+      tags:
+      - Auth & Onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SignupRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SignupRequestRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupRequest'
+          description: ''
+  /api/onboarding/signup-requests/{id}/approve/:
+    post:
+      operationId: onboarding_signup_requests_approve_create
+      description: Approve a signup request. Creates User and Person records. Admin
+        only.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Admin - Signup Requests
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/onboarding/signup-requests/{id}/delete/:
+    delete:
+      operationId: onboarding_signup_requests_delete_destroy
+      description: Delete a signup request permanently. Admin only.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Admin - Signup Requests
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/onboarding/signup-requests/{id}/reject/:
+    post:
+      operationId: onboarding_signup_requests_reject_create
+      description: Reject a signup request. Admin only.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Admin - Signup Requests
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/onboarding/signup-requests/pending/:
+    get:
+      operationId: onboarding_signup_requests_pending_list
+      description: List all pending signup requests. Admin only.
+      tags:
+      - Admin - Signup Requests
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminSignupRequest'
+          description: ''
+  /api/opportunities/:
+    get:
+      operationId: opportunities_list
+      description: List all opportunities.
+      tags:
+      - opportunities
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Opportunity'
+          description: ''
+  /api/opportunities/{id}/:
+    get:
+      operationId: opportunities_retrieve
+      description: Get details of a single opportunity.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - opportunities
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opportunity'
+          description: ''
+  /api/opportunities/create/:
+    post:
+      operationId: opportunities_create_create
+      description: Create a new opportunity.
+      tags:
+      - opportunities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpportunityRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OpportunityRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OpportunityRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opportunity'
+          description: ''
+  /api/resources/:
+    get:
+      operationId: resources_list
+      description: List all shared resources.
+      tags:
+      - resources
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+          description: ''
+  /api/resources/{id}/:
+    get:
+      operationId: resources_retrieve
+      description: Get details of a single resource.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - resources
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+          description: ''
+  /api/resources/upload/:
+    post:
+      operationId: resources_upload_create
+      description: Upload a new resource. Admin only.
+      tags:
+      - resources
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResourceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResourceRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+          description: ''
+  /api/users/{id}/set-role/:
+    post:
+      operationId: users_set_role_create
+      description: Promote or demote a user. Admin only.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Admin - User Management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRoleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRoleRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/users/create/:
+    post:
+      operationId: users_create_create
+      description: Directly create a new user. Admin only.
+      tags:
+      - Admin - User Management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminCreateUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminCreateUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminCreateUserRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCreateUser'
+          description: ''
+  /api/users/dashboard-stats/:
+    get:
+      operationId: users_dashboard_stats_retrieve
+      description: Overview stats for admin dashboard.
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/users/female/:
+    get:
+      operationId: users_female_list
+      description: List all FEMALE users who have registered/onboarded.
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/male/:
+    get:
+      operationId: users_male_list
+      description: List all MALE users who have registered/onboarded.
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/me/:
+    get:
+      operationId: users_me_retrieve
+      description: Get the profile of the currently authenticated user.
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/me/update/:
+    put:
+      operationId: users_me_update_update
+      description: Updates the current user's profile details across all 4 interfaces.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: users_me_update_partial_update
+      description: Updates the current user's profile details across all 4 interfaces.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdateRequest'
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/search/:
+    get:
+      operationId: users_search_list
+      description: Search for users by email, first name, or last name. Admin only.
+      tags:
+      - users
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/total/:
+    get:
+      operationId: users_total_retrieve
+      description: Get total count of registered users and alumni. Admin only.
+      tags:
+      - Admin - User Management
+      security:
+      - tokenAuth: []
+      - TokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    AcademicStatusEnum:
+      enum:
+      - University Graduate
+      - Still at University
+      - Not Enrolled
+      type: string
+      description: |-
+        * `University Graduate` - University Graduate
+        * `Still at University` - Still at University
+        * `Not Enrolled` - Not Enrolled
+    AdminAddAlumniRequest:
+      type: object
+      description: |-
+        Serializer for admin adding new alumni with minimal required fields.
+        Additional fields can be updated later by the alumni themselves.
+      properties:
+        full_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        phone_primary:
+          type: string
+          nullable: true
+          maxLength: 50
+    AdminCreateUser:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        is_alumni:
+          type: boolean
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+      required:
+      - username
+    AdminCreateUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        is_alumni:
+          type: boolean
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+      required:
+      - password
+      - username
+    AdminSignupRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        phone:
+          type: string
+          nullable: true
+          maxLength: 50
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        course:
+          type: string
+          nullable: true
+          maxLength: 255
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - full_name
+      - graduation_year
+      - id
+      - updated_at
+    AlumniList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        phone_primary:
+          type: string
+          nullable: true
+          maxLength: 50
+        status:
+          type: string
+          readOnly: true
+        is_archived:
+          type: boolean
+      required:
+      - id
+      - status
+    AlumniStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+      required:
+      - message
+      - status
+    BlankEnum:
+      enum:
+      - ''
+    CategoryEnum:
+      enum:
+      - Document
+      - Guide
+      - Link
+      - Handbook
+      - Other
+      type: string
+      description: |-
+        * `Document` - Document
+        * `Guide` - Guide
+        * `Link` - Link
+        * `Handbook` - Handbook
+        * `Other` - Other
+    ClaCampusEnum:
+      enum:
+      - CLA Boys
+      - CLA Girls
+      type: string
+      description: |-
+        * `CLA Boys` - CLA Boys
+        * `CLA Girls` - CLA Girls
+    EmploymentStatusEnum:
+      enum:
+      - Employed
+      - Self-Employed
+      - Unemployed
+      - Still a Student
+      type: string
+      description: |-
+        * `Employed` - Employed
+        * `Self-Employed` - Self-Employed
+        * `Unemployed` - Unemployed
+        * `Still a Student` - Still a Student
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        event_type:
+          $ref: '#/components/schemas/EventTypeEnum'
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+          nullable: true
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        location:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        rsvp_count:
+          type: integer
+          readOnly: true
+        is_rsvped:
+          type: boolean
+          readOnly: true
+      required:
+      - capacity
+      - event_type
+      - id
+      - is_rsvped
+      - location
+      - rsvp_count
+      - start_date
+      - title
+    EventRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        event_type:
+          $ref: '#/components/schemas/EventTypeEnum'
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+          nullable: true
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        location:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+      required:
+      - capacity
+      - event_type
+      - location
+      - start_date
+      - title
+    EventTypeEnum:
+      enum:
+      - Fellowship
+      - Social
+      - Career
+      - Reunion
+      - Workshop
+      - Other
+      type: string
+      description: |-
+        * `Fellowship` - Fellowship
+        * `Social` - Social
+        * `Career` - Career
+        * `Reunion` - Reunion
+        * `Workshop` - Workshop
+        * `Other` - Other
+    FileTypeEnum:
+      enum:
+      - PDF
+      - Word
+      - Excel
+      - Link
+      - Image
+      type: string
+      description: |-
+        * `PDF` - PDF
+        * `Word` - Word
+        * `Excel` - Excel
+        * `Link` - Link
+        * `Image` - Image
+    GenderEnum:
+      enum:
+      - M
+      - F
+      type: string
+      description: |-
+        * `M` - Male
+        * `F` - Female
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    MaritalStatusEnum:
+      enum:
+      - Single
+      - Married
+      type: string
+      description: |-
+        * `Single` - Single
+        * `Married` - Married
+    NullEnum:
+      enum:
+      - null
+    Opportunity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        organisation:
+          type: string
+          maxLength: 255
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        deadline:
+          type: string
+          format: date
+        location:
+          type: string
+          nullable: true
+          maxLength: 255
+        description:
+          type: string
+        requirements:
+          type: string
+          nullable: true
+        application_link:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        posted_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        posted_by_name:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - deadline
+      - description
+      - id
+      - organisation
+      - posted_by
+      - posted_by_name
+      - title
+      - type
+      - updated_at
+    OpportunityRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        organisation:
+          type: string
+          minLength: 1
+          maxLength: 255
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        deadline:
+          type: string
+          format: date
+        location:
+          type: string
+          nullable: true
+          maxLength: 255
+        description:
+          type: string
+          minLength: 1
+        requirements:
+          type: string
+          nullable: true
+        application_link:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+      required:
+      - deadline
+      - description
+      - organisation
+      - title
+      - type
+    PasswordResetConfirmRequest:
+      type: object
+      properties:
+        uidb64:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        new_password_again:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - new_password
+      - new_password_again
+      - token
+      - uidb64
+    PasswordResetRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    PasswordResetRequestRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    PasswordResetSetPasswordRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        otp:
+          type: string
+          minLength: 1
+          maxLength: 6
+        otp_code:
+          type: string
+          minLength: 1
+          maxLength: 6
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        new_password_again:
+          type: string
+          writeOnly: true
+          minLength: 8
+        confirm_password:
+          type: string
+          writeOnly: true
+          minLength: 8
+      required:
+      - email
+      - new_password
+    PasswordResetVerifyOTPRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        otp:
+          type: string
+          minLength: 1
+          maxLength: 6
+      required:
+      - email
+      - otp
+    PatchedEventRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        event_type:
+          $ref: '#/components/schemas/EventTypeEnum'
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+          nullable: true
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        location:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+    PatchedPersonRequest:
+      type: object
+      description: Full serializer for Person model for creating and editing records.
+      properties:
+        index_number:
+          type: string
+          nullable: true
+          maxLength: 50
+        names:
+          type: string
+          nullable: true
+          maxLength: 255
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        sir_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        full_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        course_offered:
+          type: string
+          nullable: true
+        home_district:
+          type: string
+          nullable: true
+          maxLength: 100
+        district_of_residence:
+          type: string
+          nullable: true
+          maxLength: 100
+        village_residence:
+          type: string
+          nullable: true
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        phone_primary:
+          type: string
+          nullable: true
+          maxLength: 50
+        phone_secondary:
+          type: string
+          nullable: true
+          maxLength: 50
+        employment_status:
+          type: string
+          nullable: true
+          maxLength: 50
+        sector_of_work:
+          type: string
+          nullable: true
+          maxLength: 100
+        area_of_work:
+          type: string
+          nullable: true
+          maxLength: 255
+        place_of_work:
+          type: string
+          nullable: true
+          maxLength: 255
+        position_at_workplace:
+          type: string
+          nullable: true
+          maxLength: 255
+        marital_status:
+          type: string
+          nullable: true
+          maxLength: 50
+        field_of_interest:
+          type: string
+          nullable: true
+        best_communication_channel:
+          type: string
+          nullable: true
+          maxLength: 255
+        title_roles:
+          type: string
+          nullable: true
+        data_source:
+          type: string
+          nullable: true
+          maxLength: 50
+        is_archived:
+          type: boolean
+    PatchedUserUpdateRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        profile_photo:
+          type: string
+          format: binary
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+          maxLength: 20
+        nationality:
+          type: string
+          nullable: true
+          maxLength: 100
+        bio:
+          type: string
+          nullable: true
+        marital_status:
+          $ref: '#/components/schemas/MaritalStatusEnum'
+        spouse_full_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        spouse_phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        spouse_email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        spouse_occupation:
+          type: string
+          nullable: true
+          maxLength: 255
+        cla_campus:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ClaCampusEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        high_school_graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        academic_status:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/AcademicStatusEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        university_institution:
+          type: string
+          nullable: true
+          maxLength: 255
+        university_course:
+          type: string
+          nullable: true
+          maxLength: 255
+        university_graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        expected_graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        address_country:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_district_region:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_city_town:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_po_box:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_physical_street:
+          type: string
+          nullable: true
+        employment_status:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/EmploymentStatusEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        employer_company_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        job_title_role:
+          type: string
+          nullable: true
+          maxLength: 255
+        industry_sector:
+          type: string
+          nullable: true
+          maxLength: 100
+        work_location:
+          type: string
+          nullable: true
+          maxLength: 255
+        work_year_started:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        work_email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        work_phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        linkedin_profile:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+    Person:
+      type: object
+      description: Full serializer for Person model for creating and editing records.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        index_number:
+          type: string
+          nullable: true
+          maxLength: 50
+        names:
+          type: string
+          nullable: true
+          maxLength: 255
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        sir_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        full_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        course_offered:
+          type: string
+          nullable: true
+        home_district:
+          type: string
+          nullable: true
+          maxLength: 100
+        district_of_residence:
+          type: string
+          nullable: true
+          maxLength: 100
+        village_residence:
+          type: string
+          nullable: true
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        phone_primary:
+          type: string
+          nullable: true
+          maxLength: 50
+        phone_secondary:
+          type: string
+          nullable: true
+          maxLength: 50
+        employment_status:
+          type: string
+          nullable: true
+          maxLength: 50
+        sector_of_work:
+          type: string
+          nullable: true
+          maxLength: 100
+        area_of_work:
+          type: string
+          nullable: true
+          maxLength: 255
+        place_of_work:
+          type: string
+          nullable: true
+          maxLength: 255
+        position_at_workplace:
+          type: string
+          nullable: true
+          maxLength: 255
+        marital_status:
+          type: string
+          nullable: true
+          maxLength: 50
+        field_of_interest:
+          type: string
+          nullable: true
+        best_communication_channel:
+          type: string
+          nullable: true
+          maxLength: 255
+        title_roles:
+          type: string
+          nullable: true
+        data_source:
+          type: string
+          nullable: true
+          maxLength: 50
+        is_archived:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - updated_at
+    PersonRequest:
+      type: object
+      description: Full serializer for Person model for creating and editing records.
+      properties:
+        index_number:
+          type: string
+          nullable: true
+          maxLength: 50
+        names:
+          type: string
+          nullable: true
+          maxLength: 255
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        sir_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        full_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        course_offered:
+          type: string
+          nullable: true
+        home_district:
+          type: string
+          nullable: true
+          maxLength: 100
+        district_of_residence:
+          type: string
+          nullable: true
+          maxLength: 100
+        village_residence:
+          type: string
+          nullable: true
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        phone_primary:
+          type: string
+          nullable: true
+          maxLength: 50
+        phone_secondary:
+          type: string
+          nullable: true
+          maxLength: 50
+        employment_status:
+          type: string
+          nullable: true
+          maxLength: 50
+        sector_of_work:
+          type: string
+          nullable: true
+          maxLength: 100
+        area_of_work:
+          type: string
+          nullable: true
+          maxLength: 255
+        place_of_work:
+          type: string
+          nullable: true
+          maxLength: 255
+        position_at_workplace:
+          type: string
+          nullable: true
+          maxLength: 255
+        marital_status:
+          type: string
+          nullable: true
+          maxLength: 50
+        field_of_interest:
+          type: string
+          nullable: true
+        best_communication_channel:
+          type: string
+          nullable: true
+          maxLength: 255
+        title_roles:
+          type: string
+          nullable: true
+        data_source:
+          type: string
+          nullable: true
+          maxLength: 50
+        is_archived:
+          type: boolean
+    RSVPResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        rsvp_count:
+          type: integer
+        error:
+          type: string
+      required:
+      - rsvp_count
+    RegisterAlumniRequest:
+      type: object
+      properties:
+        full_name:
+          type: string
+          minLength: 1
+        graduation_year:
+          type: integer
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password_again:
+          type: string
+          writeOnly: true
+          minLength: 1
+        phone:
+          type: string
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        course:
+          type: string
+      required:
+      - email
+      - full_name
+      - graduation_year
+      - password
+      - password_again
+    RegisteredAlumni:
+      type: object
+      description: |-
+        Serializer for alumni who have registered (have an AlumniAccount).
+        Includes more profile information for a directory view.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        sir_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        phone_primary:
+          type: string
+          nullable: true
+          maxLength: 50
+        employment_status:
+          type: string
+          nullable: true
+          maxLength: 50
+        sector_of_work:
+          type: string
+          nullable: true
+          maxLength: 100
+        area_of_work:
+          type: string
+          nullable: true
+          maxLength: 255
+        place_of_work:
+          type: string
+          nullable: true
+          maxLength: 255
+        position_at_workplace:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - id
+    Resource:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        file_type:
+          $ref: '#/components/schemas/FileTypeEnum'
+        file_url:
+          type: string
+          format: uri
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+        uploaded_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        uploaded_by_name:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - file_type
+      - file_url
+      - id
+      - title
+      - updated_at
+      - uploaded_by
+      - uploaded_by_name
+    ResourceRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        file_type:
+          $ref: '#/components/schemas/FileTypeEnum'
+        file_url:
+          type: string
+          format: uri
+          minLength: 1
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+      required:
+      - category
+      - file_type
+      - file_url
+      - title
+    RoleEnum:
+      enum:
+      - admin
+      - alumni
+      type: string
+      description: |-
+        * `admin` - admin
+        * `alumni` - alumni
+    SignupRequest:
+      type: object
+      properties:
+        full_name:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        phone:
+          type: string
+          nullable: true
+          maxLength: 50
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        course:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - email
+      - full_name
+      - graduation_year
+    SignupRequestRequest:
+      type: object
+      properties:
+        full_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        phone:
+          type: string
+          nullable: true
+          maxLength: 50
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        course:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - email
+      - full_name
+      - graduation_year
+    StatusEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+    TypeEnum:
+      enum:
+      - Job
+      - Scholarship
+      - Internship
+      - Fellowship
+      type: string
+      description: |-
+        * `Job` - Job
+        * `Scholarship` - Scholarship
+        * `Internship` - Internship
+        * `Fellowship` - Fellowship
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        is_alumni:
+          type: boolean
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        profile_photo:
+          type: string
+          format: uri
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+          maxLength: 20
+        nationality:
+          type: string
+          nullable: true
+          maxLength: 100
+        bio:
+          type: string
+          nullable: true
+        marital_status:
+          $ref: '#/components/schemas/MaritalStatusEnum'
+        spouse_full_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        spouse_phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        spouse_email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        spouse_occupation:
+          type: string
+          nullable: true
+          maxLength: 255
+        cla_campus:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ClaCampusEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        high_school_graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        academic_status:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/AcademicStatusEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        university_institution:
+          type: string
+          nullable: true
+          maxLength: 255
+        university_course:
+          type: string
+          nullable: true
+          maxLength: 255
+        university_graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        expected_graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        address_country:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_district_region:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_city_town:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_po_box:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_physical_street:
+          type: string
+          nullable: true
+        employment_status:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/EmploymentStatusEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        employer_company_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        job_title_role:
+          type: string
+          nullable: true
+          maxLength: 255
+        industry_sector:
+          type: string
+          nullable: true
+          maxLength: 100
+        work_location:
+          type: string
+          nullable: true
+          maxLength: 255
+        work_year_started:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        work_email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        work_phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        linkedin_profile:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+      required:
+      - id
+      - username
+    UserRoleRequest:
+      type: object
+      properties:
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: |-
+            The role to assign: 'admin' or 'alumni'
+
+            * `admin` - admin
+            * `alumni` - alumni
+      required:
+      - role
+    UserUpdateRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        gender:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        profile_photo:
+          type: string
+          format: binary
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+          maxLength: 20
+        nationality:
+          type: string
+          nullable: true
+          maxLength: 100
+        bio:
+          type: string
+          nullable: true
+        marital_status:
+          $ref: '#/components/schemas/MaritalStatusEnum'
+        spouse_full_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        spouse_phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        spouse_email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        spouse_occupation:
+          type: string
+          nullable: true
+          maxLength: 255
+        cla_campus:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ClaCampusEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        high_school_graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        academic_status:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/AcademicStatusEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        university_institution:
+          type: string
+          nullable: true
+          maxLength: 255
+        university_course:
+          type: string
+          nullable: true
+          maxLength: 255
+        university_graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        expected_graduation_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        address_country:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_district_region:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_city_town:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_po_box:
+          type: string
+          nullable: true
+          maxLength: 100
+        address_physical_street:
+          type: string
+          nullable: true
+        employment_status:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/EmploymentStatusEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        employer_company_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        job_title_role:
+          type: string
+          nullable: true
+          maxLength: 255
+        industry_sector:
+          type: string
+          nullable: true
+          maxLength: 100
+        work_location:
+          type: string
+          nullable: true
+          maxLength: 255
+        work_year_started:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        work_email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        work_phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        linkedin_profile:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+  securitySchemes:
+    TokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Token-based authentication. Format: "Token <your_token>"'
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
