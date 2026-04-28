@@ -25,7 +25,7 @@ from .serializers import (
     PasswordResetConfirmSerializer, SignupRequestSerializer, 
     AdminSignupRequestSerializer, AdminCreateUserSerializer,
     PasswordResetRequestSerializer, PasswordResetVerifyOTPSerializer,
-    PasswordResetSetPasswordSerializer
+    PasswordResetSetPasswordSerializer, UserRoleSerializer
 )
 
 User = get_user_model()

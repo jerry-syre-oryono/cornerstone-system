@@ -16,5 +16,5 @@ class OpportunitySerializer(serializers.ModelSerializer):
         read_only_fields = ['posted_by', 'created_at', 'updated_at']
 
     @extend_schema_field(OpenApiTypes.STR)
-    def get_posted_by_name(self, obj):
+    def get_posted_by_name(self, obj) -> str:
         return obj.posted_by.get_full_name() if obj.posted_by else "System"

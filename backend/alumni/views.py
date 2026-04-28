@@ -64,7 +64,7 @@ def edit_alumni(request, pk):
         return Response(serializer.data)
     return Response(serializer.errors, status=400)
 
-@extend_schema(responses={200: AlumniStatusResponseSerializer})
+@extend_schema(request=None, responses={200: AlumniStatusResponseSerializer})
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def archive_alumni(request, pk):
@@ -79,7 +79,7 @@ def archive_alumni(request, pk):
     except Person.DoesNotExist:
         return Response({"error": "Alumni record not found."}, status=404)
 
-@extend_schema(responses={200: AlumniStatusResponseSerializer})
+@extend_schema(request=None, responses={200: AlumniStatusResponseSerializer})
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def unarchive_alumni(request, pk):

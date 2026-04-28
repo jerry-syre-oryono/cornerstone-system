@@ -16,5 +16,5 @@ class ResourceSerializer(serializers.ModelSerializer):
         read_only_fields = ['uploaded_by', 'created_at', 'updated_at']
 
     @extend_schema_field(OpenApiTypes.STR)
-    def get_uploaded_by_name(self, obj):
+    def get_uploaded_by_name(self, obj) -> str:
         return obj.uploaded_by.get_full_name() if obj.uploaded_by else "System"

@@ -40,6 +40,7 @@ class EventListView(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
 @extend_schema(
+    request=None,
     responses={200: RSVPResponseSerializer, 400: RSVPResponseSerializer},
     description="User: RSVP to an event. If already RSVPed, it will toggle/remove the RSVP."
 )
