@@ -38,6 +38,9 @@ urlpatterns = [
     # Events
     path('api/events/', include('events.urls')),
 
+    # Careers / Opportunities
+    path('api/opportunities/', include('careers.urls')),
+
     # Alumni
     path('api/alumni/', alumni_views.list_alumni, name='list_alumni'),
     path('api/alumni/add/', alumni_views.add_alumni, name='add_alumni'),

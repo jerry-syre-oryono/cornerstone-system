@@ -36,10 +36,26 @@ class AlumniDirectoryTests(TestCase):
         
         self.directory_url = reverse('list_registered_alumni')
         self.admin_list_url = reverse('list_alumni')
+        self.add_alumni_url = reverse('add_alumni')
+
+    def test_add_alumni_without_data_source(self):
+        self.client.force_authenticate(user=self.admin_user)
+        data = {
+            "full_name": "New Alumni",
+            "graduation_year": 2022,
+            "email": "new@example.com",
+            "phone_primary": "0770000000",
+            "course_offered": "BSE"
+        }
+        # Explicitly ensure data_source is NOT in the request
+        response = self.client.post(self.add_alumni_url, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Person.objects.filter(full_name="New Alumni").count(), 1)
+        self.assertIsNone(Person.objects.get(full_name="New Alumni").data_source)
 
     def test_directory_requires_auth(self):
         response = self.client.get(self.directory_url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
     def test_directory_returns_only_registered(self):
         self.client.force_authenticate(user=self.user)

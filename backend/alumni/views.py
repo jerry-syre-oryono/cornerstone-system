@@ -7,7 +7,7 @@ from .serializers import AlumniListSerializer, RegisteredAlumniSerializer, Perso
 
 @extend_schema(responses={200: AlumniListSerializer(many=True)})
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAdminUser])
 def list_alumni(request):
     """
     List ALL ACTIVE alumni (registered and pending).

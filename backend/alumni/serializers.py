@@ -44,5 +44,5 @@ class AdminAddAlumniSerializer(serializers.ModelSerializer):
         model = Person
         fields = [
             'full_name', 'graduation_year', 'course_offered', 
-            'email', 'phone_primary', 'data_source'
+            'email', 'phone_primary'
         ]
