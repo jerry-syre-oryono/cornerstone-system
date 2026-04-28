@@ -529,7 +529,7 @@ def verify_password_reset_otp(request):
     Marks the OTP as verified so it can be used to reset the password.
     """
     email = request.data.get("email")
-    otp = request.data.get("otp")
+    otp = request.data.get("otp") or request.data.get("otp_code") # Support both names
 
     if not email or not otp:
         return Response({"error": "Email and OTP are required."}, status=400)
@@ -567,16 +567,17 @@ def verify_password_reset_otp(request):
 def set_password_with_otp(request):
     """
     Step 3: Set new password using verified OTP.
+    Supports both direct reset (if OTP is valid) and standard multi-step flow.
     """
     email = request.data.get("email")
-    otp = request.data.get("otp")
+    otp = request.data.get("otp") or request.data.get("otp_code")
     new_password = request.data.get("new_password")
-    new_password_again = request.data.get("new_password_again")
+    confirm_password = request.data.get("confirm_password") or request.data.get("new_password_again")
 
-    if not all([email, otp, new_password, new_password_again]):
-        return Response({"error": "All fields are required."}, status=400)
+    if not all([email, otp, new_password, confirm_password]):
+        return Response({"error": "All fields are required (email, otp/otp_code, new_password, confirm_password)."}, status=400)
 
-    if new_password != new_password_again:
+    if new_password != confirm_password:
         return Response({"error": "Passwords do not match."}, status=400)
 
     otp_record = PasswordResetOTP.objects.filter(
@@ -588,9 +589,8 @@ def set_password_with_otp(request):
     if not otp_record:
         return Response({"error": "Invalid OTP."}, status=400)
 
-    if not otp_record.is_verified:
-        return Response({"error": "OTP has not been verified. Please verify the OTP first."}, status=400)
-
+    # Note: We now allow direct reset if the OTP is valid and not expired, 
+    # even if it wasn't pre-verified via the verify endpoint.
     if timezone.now() > otp_record.expires_at:
         return Response({"error": "OTP has expired. Please request a new one."}, status=400)
 
@@ -602,6 +602,7 @@ def set_password_with_otp(request):
     user.save()
 
     otp_record.is_used = True
+    otp_record.is_verified = True # Mark as verified as well since it worked
     otp_record.save()
 
     return Response({

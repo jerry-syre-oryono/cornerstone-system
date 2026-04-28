@@ -82,3 +82,25 @@ def update_profile(request):
         serializer.save()
         return Response(UserSerializer(user).data)
     return Response(serializer.errors, status=400)
+
+from django.db.models import Q
+
+@extend_schema(responses={200: UserSerializer(many=True)})
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def search_users(request):
+    """
+    Search for users by email, first name, or last name. Admin only.
+    """
+    query = request.query_params.get('q', '')
+    if not query:
+        return Response([])
+    
+    users = User.objects.filter(
+        Q(email__icontains=query) |
+        Q(first_name__icontains=query) |
+        Q(last_name__icontains=query)
+    )[:20] # Limit results
+    
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)

@@ -37,13 +37,24 @@ class PasswordResetVerifyOTPSerializer(serializers.Serializer):
 
 class PasswordResetSetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    otp = serializers.CharField(max_length=6)
+    otp = serializers.CharField(max_length=6, required=False)
+    otp_code = serializers.CharField(max_length=6, required=False)
     new_password = serializers.CharField(write_only=True, min_length=8)
-    new_password_again = serializers.CharField(write_only=True, min_length=8)
+    new_password_again = serializers.CharField(write_only=True, min_length=8, required=False)
+    confirm_password = serializers.CharField(write_only=True, min_length=8, required=False)
 
     def validate(self, data):
-        if data['new_password'] != data['new_password_again']:
-            raise serializers.ValidationError({"new_password_again": "Passwords do not match."})
+        otp = data.get('otp') or data.get('otp_code')
+        if not otp:
+            raise serializers.ValidationError("OTP code is required.")
+        
+        # Determine which password confirmation field to use
+        confirm = data.get('confirm_password') or data.get('new_password_again')
+        if not confirm:
+            raise serializers.ValidationError("Password confirmation is required.")
+
+        if data['new_password'] != confirm:
+            raise serializers.ValidationError("Passwords do not match.")
         return data
 
 class SignupRequestSerializer(serializers.ModelSerializer):
