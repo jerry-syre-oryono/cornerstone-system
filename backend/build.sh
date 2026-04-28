@@ -35,4 +35,11 @@ else
     echo "⚠️  No Excel file found, skipping data import"
 fi
 
+# One-time data transfer from local to Render
+if [ -f "transfer_data.json" ]; then
+    echo "📦 Importing transfer_data.json..."
+    python manage.py loaddata transfer_data.json
+    echo "✅ JSON data import completed"
+fi
+
 echo "✅ Build completed successfully!"
