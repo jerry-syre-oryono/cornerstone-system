@@ -4,7 +4,7 @@ from drf_spectacular.types import OpenApiTypes
 from .models import Opportunity
 
 class OpportunitySerializer(serializers.ModelSerializer):
-    posted_by_name = serializers.ReadOnlyField(source='posted_by.get_full_name')
+    posted_by_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Opportunity

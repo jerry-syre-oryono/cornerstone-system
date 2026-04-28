@@ -4,7 +4,7 @@ from drf_spectacular.types import OpenApiTypes
 from .models import Resource
 
 class ResourceSerializer(serializers.ModelSerializer):
-    uploaded_by_name = serializers.ReadOnlyField(source='uploaded_by.get_full_name')
+    uploaded_by_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Resource
