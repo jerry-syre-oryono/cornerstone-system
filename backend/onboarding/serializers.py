@@ -57,6 +57,9 @@ class PasswordResetSetPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError("Passwords do not match.")
         return data
 
+class UserRoleSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=['admin', 'alumni'], help_text="The role to assign: 'admin' or 'alumni'")
+
 class SignupRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = SignupRequest

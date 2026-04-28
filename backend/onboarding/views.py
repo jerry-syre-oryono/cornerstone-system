@@ -300,7 +300,7 @@ def admin_create_user(request):
 
 @extend_schema(
     tags=['Admin - User Management'],
-    request=dict,
+    request=UserRoleSerializer,
     responses={200: dict},
     description="Promote or demote a user. Admin only."
 )
