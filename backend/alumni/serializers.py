@@ -43,6 +43,6 @@ class AdminAddAlumniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = [
-            'full_name', 'graduation_year', 'course_offered', 
+            'full_name', 'graduation_year', 
             'email', 'phone_primary'
         ]

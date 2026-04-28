@@ -35,11 +35,4 @@ else
     echo "⚠️  No Excel file found, skipping data import"
 fi
 
-# One-time data transfer from local to Render
-if [ -f "transfer_data.json" ]; then
-    echo "📦 Running safe data merge from transfer_data.json..."
-    python manage.py shell -c "from scripts.safe_transfer import run; run()"
-    echo "✅ Safe data merge completed"
-fi
-
 echo "✅ Build completed successfully!"

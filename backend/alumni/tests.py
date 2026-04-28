@@ -44,10 +44,9 @@ class AlumniDirectoryTests(TestCase):
             "full_name": "New Alumni",
             "graduation_year": 2022,
             "email": "new@example.com",
-            "phone_primary": "0770000000",
-            "course_offered": "BSE"
+            "phone_primary": "0770000000"
         }
-        # Explicitly ensure data_source is NOT in the request
+        # Explicitly ensure data_source and course_offered are NOT in the request
         response = self.client.post(self.add_alumni_url, data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Person.objects.filter(full_name="New Alumni").count(), 1)
