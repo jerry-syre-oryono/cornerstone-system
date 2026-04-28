@@ -1,9 +1,13 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiTypes
 from .models import Person
 from .serializers import AlumniListSerializer, RegisteredAlumniSerializer, PersonSerializer, AdminAddAlumniSerializer
+
+class AlumniStatusResponseSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    message = serializers.CharField()
 
 @extend_schema(responses={200: AlumniListSerializer(many=True)})
 @api_view(['GET'])
@@ -59,6 +63,7 @@ def edit_alumni(request, pk):
         return Response(serializer.data)
     return Response(serializer.errors, status=400)
 
+@extend_schema(responses={200: AlumniStatusResponseSerializer})
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def archive_alumni(request, pk):
@@ -73,6 +78,7 @@ def archive_alumni(request, pk):
     except Person.DoesNotExist:
         return Response({"error": "Alumni record not found."}, status=404)
 
+@extend_schema(responses={200: AlumniStatusResponseSerializer})
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def unarchive_alumni(request, pk):

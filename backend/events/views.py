@@ -1,10 +1,15 @@
-from rest_framework import viewsets, generics, status
+from rest_framework import viewsets, generics, status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from .models import Event
 from .serializers import EventSerializer
+
+class RSVPResponseSerializer(serializers.Serializer):
+    status = serializers.CharField(required=False)
+    rsvp_count = serializers.IntegerField()
+    error = serializers.CharField(required=False)
 
 # Admin APIs: Create, Update, Delete
 class AdminEventViewSet(viewsets.ModelViewSet):
@@ -35,7 +40,7 @@ class EventListView(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
 @extend_schema(
-    responses={200: dict, 400: dict},
+    responses={200: RSVPResponseSerializer, 400: RSVPResponseSerializer},
     description="User: RSVP to an event. If already RSVPed, it will toggle/remove the RSVP."
 )
 @api_view(['POST'])

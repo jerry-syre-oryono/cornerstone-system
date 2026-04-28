@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 from .models import Event
 
 class EventSerializer(serializers.ModelSerializer):
@@ -12,6 +14,7 @@ class EventSerializer(serializers.ModelSerializer):
             'capacity', 'location', 'description', 'rsvp_count', 'is_rsvped'
         ]
 
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_is_rsvped(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
