@@ -1,6 +1,7 @@
 import random
 from datetime import timedelta
 from django.core.cache import cache
+from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -297,6 +298,42 @@ def admin_create_user(request):
         user = serializer.save()
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
+
+@extend_schema(
+    tags=['Admin - User Management'],
+    parameters=[
+        OpenApiParameter(name='q', description='Search by email or name', required=True, type=str)
+    ],
+    responses={200: dict},
+    description="Get a user's role by email or name. Admin only."
+)
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def get_user_role(request):
+    """
+    Get a user's role by email or name.
+    """
+    query_str = request.query_params.get('q', '')
+    if not query_str:
+        return Response({"error": "Query parameter 'q' (email or name) is required."}, status=400)
+    
+    users = User.objects.filter(
+        Q(email__icontains=query_str) |
+        Q(first_name__icontains=query_str) |
+        Q(last_name__icontains=query_str)
+    )
+    
+    results = []
+    for user in users:
+        role = 'admin' if user.is_staff or user.is_superuser else 'alumni'
+        results.append({
+            "id": user.id,
+            "full_name": f"{user.first_name} {user.last_name}".strip(),
+            "email": user.email,
+            "role": role
+        })
+        
+    return Response(results)
 
 @extend_schema(
     tags=['Admin - User Management'],

@@ -117,4 +117,68 @@ class LoginTests(TestCase):
         self.assertIsNone(response.data['person_id'])
         self.assertFalse(response.data['is_alumni'])
 
+class UserManagementTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin_user = User.objects.create_superuser(
+            username="admin@example.com",
+            email="admin@example.com",
+            password="adminpassword"
+        )
+        self.alumni_user = User.objects.create_user(
+            username="alumni@example.com",
+            email="alumni@example.com",
+            password="alumnipassword",
+            first_name="Alumni",
+            last_name="User"
+        )
+        self.client.force_authenticate(user=self.admin_user)
+
+    def test_get_user_role_by_email(self):
+        url = reverse('get_user_role')
+        response = self.client.get(url, {'q': 'alumni@example.com'})
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['email'], 'alumni@example.com')
+        self.assertEqual(response.data[0]['role'], 'alumni')
+
+    def test_get_user_role_by_name(self):
+        url = reverse('get_user_role')
+        response = self.client.get(url, {'q': 'Alumni'})
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['full_name'], 'Alumni User')
+        self.assertEqual(response.data[0]['role'], 'alumni')
+
+    def test_get_user_role_admin(self):
+        url = reverse('get_user_role')
+        response = self.client.get(url, {'q': 'admin@example.com'})
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['role'], 'admin')
+
+    def test_get_user_role_no_query(self):
+        url = reverse('get_user_role')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+    def test_change_user_role(self):
+        url = reverse('change_user_role', kwargs={'pk': self.alumni_user.pk})
+        response = self.client.post(url, {'role': 'admin'}, format='json')
+        
+        self.assertEqual(response.status_code, 200)
+        self.alumni_user.refresh_from_db()
+        self.assertTrue(self.alumni_user.is_staff)
+        self.assertTrue(self.alumni_user.is_superuser)
+
+        # Change back
+        response = self.client.post(url, {'role': 'alumni'}, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.alumni_user.refresh_from_db()
+        self.assertFalse(self.alumni_user.is_staff)
+        self.assertFalse(self.alumni_user.is_superuser)
+
 
