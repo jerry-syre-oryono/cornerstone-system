@@ -85,7 +85,16 @@ def update_profile(request):
 
 from django.db.models import Q
 
-@extend_schema(responses={200: UserSerializer(many=True)})
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from .models import User
+from .serializers import UserSerializer, UserUpdateSerializer
+
+@extend_schema(
+    parameters=[
+        OpenApiParameter(name='q', description='Search query (email, first name, or last name)', required=False, type=str)
+    ],
+    responses={200: UserSerializer(many=True)}
+)
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def search_users(request):
