@@ -37,12 +37,12 @@ class PersonSerializer(serializers.ModelSerializer):
 
 class AdminAddAlumniSerializer(serializers.ModelSerializer):
     """
-    Serializer for admin adding new alumni with minimal required fields.
-    Additional fields can be updated later by the alumni themselves.
+    Serializer for admin adding or editing alumni with essential fields.
+    Matches the Add Alumni API and allows updating stats-relevant fields.
     """
     class Meta:
         model = Person
         fields = [
             'full_name', 'graduation_year', 
-            'email', 'phone_primary'
+            'email', 'phone_primary', 'gender', 'employment_status'
         ]

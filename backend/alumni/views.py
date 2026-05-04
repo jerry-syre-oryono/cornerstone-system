@@ -45,12 +45,13 @@ def add_alumni(request):
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
 
-@extend_schema(request=PersonSerializer, responses={200: PersonSerializer})
+@extend_schema(request=AdminAddAlumniSerializer, responses={200: AdminAddAlumniSerializer})
 @api_view(['PUT', 'PATCH'])
 @permission_classes([IsAdminUser])
 def edit_alumni(request, pk):
     """
     Edit an existing alumni record. Admin only.
+    Uses the same fields as the Add Alumni API.
     """
     try:
         person = Person.objects.get(pk=pk)
@@ -58,7 +59,7 @@ def edit_alumni(request, pk):
         return Response({"error": "Alumni record not found."}, status=404)
     
     partial = request.method == 'PATCH'
-    serializer = PersonSerializer(person, data=request.data, partial=partial)
+    serializer = AdminAddAlumniSerializer(person, data=request.data, partial=partial)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
