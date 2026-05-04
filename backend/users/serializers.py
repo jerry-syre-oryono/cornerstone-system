@@ -32,3 +32,5 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'industry_sector', 'work_location', 'work_year_started', 'work_email',
             'work_phone', 'linkedin_profile'
         ]
+        # Ensure all fields are optional for partial updates in Swagger/API
+        extra_kwargs = {field: {'required': False} for field in fields}

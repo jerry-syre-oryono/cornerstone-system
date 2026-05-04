@@ -12,16 +12,16 @@ from onboarding.models import SignupRequest
 @permission_classes([IsAdminUser])
 def dashboard_stats(request):
     """
-    Overview stats for admin dashboard.
+    Overview stats for admin dashboard. Fetched from the Alumni Database (Person model).
     """
     stats = {
         "total_alumni": Person.objects.count(),
         "total_users_signed_up": User.objects.count(),
-        "total_male_users": User.objects.filter(gender='M').count(),
-        "total_female_users": User.objects.filter(gender='F').count(),
-        "total_at_university": User.objects.filter(academic_status='Still at University').count(),
-        "total_who_have_graduated": User.objects.filter(academic_status='University Graduate').count(),
-        "total_employed": User.objects.filter(employment_status__in=['Employed', 'Self-Employed']).count(),
+        "total_male_alumni": Person.objects.filter(gender='M').count(),
+        "total_female_alumni": Person.objects.filter(gender='F').count(),
+        "total_employed_alumni": Person.objects.filter(employment_status__in=['EMPLOYED', 'Yes', 'Employed', 'Self-Employed']).count(),
+        "total_unemployed_alumni": Person.objects.filter(employment_status__in=['UNEMPLOYED', 'No', 'Unemployed']).count(),
+        "total_students_alumni": Person.objects.filter(employment_status__in=['Student', 'Still a Student']).count(),
         "total_pending_approvals": SignupRequest.objects.filter(status='PENDING').count(),
     }
     return Response(stats)

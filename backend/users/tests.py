@@ -23,6 +23,8 @@ class UserSearchAndRoleTests(TestCase):
         )
         
         self.search_url = reverse('search_users')
+        self.stats_url = reverse('dashboard_stats')
+        self.update_url = reverse('update_profile')
 
     def test_search_users(self):
         # Search by first name
@@ -44,3 +46,33 @@ class UserSearchAndRoleTests(TestCase):
         self.other_user.refresh_from_db()
         self.assertTrue(self.other_user.is_staff)
         self.assertTrue(self.other_user.is_superuser)
+
+    def test_dashboard_stats(self):
+        from alumni.models import Person
+        Person.objects.create(full_name="Alumni 1", gender='M', employment_status='EMPLOYED')
+        Person.objects.create(full_name="Alumni 2", gender='F', employment_status='Student')
+        
+        response = self.client.get(self.stats_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['total_alumni'], 2)
+        self.assertEqual(response.data['total_male_alumni'], 1)
+        self.assertEqual(response.data['total_female_alumni'], 1)
+        self.assertEqual(response.data['total_employed_alumni'], 1)
+        self.assertEqual(response.data['total_students_alumni'], 1)
+
+    def test_partial_update_profile(self):
+        self.client.force_authenticate(user=self.other_user)
+        # Update only one field
+        response = self.client.patch(self.update_url, {'phone_number': '123456789'})
+        self.assertEqual(response.status_code, 200)
+        self.other_user.refresh_from_db()
+        self.assertEqual(self.other_user.phone_number, '123456789')
+        # Ensure other fields are not wiped
+        self.assertEqual(self.other_user.first_name, 'Jane')
+
+        # Test PUT with partial data (should work because we use partial=True in view)
+        response = self.client.put(self.update_url, {'nationality': 'Ugandan'})
+        self.assertEqual(response.status_code, 200)
+        self.other_user.refresh_from_db()
+        self.assertEqual(self.other_user.nationality, 'Ugandan')
+        self.assertEqual(self.other_user.phone_number, '123456789')
