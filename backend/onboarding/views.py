@@ -366,6 +366,32 @@ def change_user_role(request, pk):
         return Response({"error": "User not found."}, status=404)
 
 @extend_schema(
+    tags=['Admin - User Management'],
+    responses={200: dict},
+    description="List all users with admin roles. Admin only."
+)
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def list_admin_users(request):
+    """
+    List all users who are staff or superusers.
+    """
+    admin_users = User.objects.filter(Q(is_staff=True) | Q(is_superuser=True))
+    
+    results = []
+    for user in admin_users:
+        results.append({
+            "id": user.id,
+            "full_name": f"{user.first_name} {user.last_name}".strip(),
+            "email": user.email,
+            "role": "admin",
+            "is_staff": user.is_staff,
+            "is_superuser": user.is_superuser
+        })
+        
+    return Response(results)
+
+@extend_schema(
     tags=['Auth & Onboarding'],
     request=LoginSerializer, 
     responses={200: dict},

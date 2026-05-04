@@ -181,4 +181,13 @@ class UserManagementTests(TestCase):
         self.assertFalse(self.alumni_user.is_staff)
         self.assertFalse(self.alumni_user.is_superuser)
 
+    def test_list_admin_users(self):
+        url = reverse('list_admin_users')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        # Should include self.admin_user but not self.alumni_user (initially)
+        self.assertTrue(any(u['email'] == self.admin_user.email for u in response.data))
+        self.assertFalse(any(u['email'] == self.alumni_user.email for u in response.data))
+
 
