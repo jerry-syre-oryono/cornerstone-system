@@ -7,10 +7,12 @@ class RegisteredAlumniSerializer(serializers.ModelSerializer):
     Serializer for alumni who have registered (have an AlumniAccount).
     Includes more profile information for a directory view.
     """
+    user_id = serializers.IntegerField(source='alumni_account.user_id', read_only=True)
+
     class Meta:
         model = Person
         fields = [
-            'id', 'full_name', 'first_name', 'sir_name', 'graduation_year', 
+            'id', 'user_id', 'full_name', 'first_name', 'sir_name', 'graduation_year', 
             'email', 'phone_primary', 'employment_status', 'sector_of_work', 
             'area_of_work', 'place_of_work', 'position_at_workplace'
         ]
@@ -18,10 +20,11 @@ class RegisteredAlumniSerializer(serializers.ModelSerializer):
 class AlumniListSerializer(serializers.ModelSerializer):
 
     status = serializers.SerializerMethodField()
+    user_id = serializers.IntegerField(source='alumni_account.user_id', read_only=True, allow_null=True)
 
     class Meta:
         model = Person
-        fields = ['id', 'full_name', 'graduation_year', 'email', 'phone_primary', 'status', 'is_archived']
+        fields = ['id', 'user_id', 'full_name', 'graduation_year', 'email', 'phone_primary', 'status', 'is_archived']
 
     @extend_schema_field(serializers.CharField())
     def get_status(self, obj):
@@ -31,6 +34,8 @@ class PersonSerializer(serializers.ModelSerializer):
     """
     Full serializer for Person model for creating and editing records.
     """
+    user_id = serializers.IntegerField(source='alumni_account.user_id', read_only=True, allow_null=True)
+
     class Meta:
         model = Person
         fields = '__all__'
