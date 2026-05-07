@@ -24,7 +24,7 @@ class AlumniListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Person
-        fields = ['id', 'user_id', 'full_name', 'graduation_year', 'email', 'phone_primary', 'status', 'is_archived']
+        fields = ['id', 'user_id', 'full_name', 'graduation_year', 'email', 'phone_primary', 'gender', 'employment_status', 'status', 'is_archived']
 
     @extend_schema_field(serializers.CharField())
     def get_status(self, obj):
