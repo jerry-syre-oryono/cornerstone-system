@@ -17,6 +17,11 @@ class AdminEventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     permission_classes = [IsAdminUser]
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsAdminUser()]
+
     @extend_schema(description="Admin: Create a new event.")
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
